@@ -1,10 +1,15 @@
-import { Text } from "react-native";
+import InitialAuth from "@/components/initialScreens/InitialAuth";
+import InitialNotAuth from "@/components/initialScreens/InitialNotAuth";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function initiallScreen() {
-  return (
+  const [auth, setAuth] = useState(true); //from asyncStorage or firebase
+
+  if (auth) return <InitialAuth />
+  else return (
     <SafeAreaView>
-      <Text>Messenger</Text>
+      <InitialNotAuth />
     </SafeAreaView>
   );
-};
+}
