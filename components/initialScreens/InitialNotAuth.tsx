@@ -1,5 +1,5 @@
 import { Entypo } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
+import { Link, useNavigation } from "expo-router";
 import { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Animated, {
@@ -9,12 +9,12 @@ import Animated, {
 } from "react-native-reanimated";
 
 export default function InitialNotAuth() {
-  const marginLeft = useSharedValue(0);
   const navigation = useNavigation();
   navigation.setOptions({
     headerShown: false
-  })
+  });
 
+  const marginLeft = useSharedValue(0);
   useEffect(() => {
     marginLeft.value = withTiming(
       40,
@@ -26,12 +26,14 @@ export default function InitialNotAuth() {
   return (
     <View style={styles.container}>
       <Text style={styles.mainText}>Welcome to Messenger</Text>
-      <TouchableOpacity style={styles.button}>
-        <Text>Start</Text>
-        <Animated.View style={{ marginLeft }}>
-          <Entypo name="chevron-small-right" size={24} color="black" />
-        </Animated.View>
-      </TouchableOpacity>
+      <Link href='/(sign)/SignUp' asChild>
+          <TouchableOpacity style={styles.button}>
+          <Text>Start</Text>
+          <Animated.View style={{ marginLeft }}>
+            <Entypo name="chevron-small-right" size={24} color="black" />
+          </Animated.View>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 }

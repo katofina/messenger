@@ -20,6 +20,7 @@ export default function RootLayout() {
             </TouchableOpacity>
         }}
       />
+      <Stack.Screen name="(sign)" options={{headerShown: false}}/>
     </Stack>
   );
 };
