@@ -1,5 +1,5 @@
 import { MenuButton } from "@/components/headerButtons/MenuButton";
-import { SearchButton } from "@/components/headerButtons/searchButton";
+import { SearchButton } from "@/components/headerButtons/SearchButton";
 import { store } from "@/redux/Store";
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";

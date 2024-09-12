@@ -11,6 +11,8 @@ import { Input } from "@/components/sign/Input";
 import { PasswordInput } from "@/components/sign/PasswordInput";
 import { useState } from "react";
 import { Link } from "expo-router";
+import useThemeColor from "@/hooks/useThemeColor";
+import { ObjectColor } from "@/constants/theme/types";
 
 interface SignUpData {
   confirm_password: string;
@@ -32,6 +34,9 @@ export default function SignUp() {
     if (data.confirm_password === data.password) console.log(data);
     else setIsConfirPass(false);
   }
+
+  const { colors } = useThemeColor();
+  const styles = getStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -112,7 +117,7 @@ export default function SignUp() {
           style={styles.button}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text>Create</Text>
+          <Text style={styles.simpleText}>Create</Text>
         </TouchableOpacity>
         <Link href="/(sign)/SignIn" style={styles.link}>
           Do you have account?
@@ -144,9 +149,9 @@ export default function SignUp() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors: ObjectColor) => StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: colors.background,
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
@@ -154,34 +159,38 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 25,
+    color: colors.text
   },
   form: {
-    shadowColor: "grey",
+    shadowColor: colors.shadowColor,
     elevation: 10,
-    backgroundColor: "white",
+    backgroundColor: colors.background,
     width: "80%",
     alignItems: "center",
     justifyContent: "space-evenly",
     height: 350,
   },
   button: {
-    shadowColor: "grey",
+    shadowColor: colors.shadowColor,
     elevation: 5,
-    backgroundColor: "white",
+    backgroundColor: colors.button,
     width: 150,
     height: 45,
     alignItems: "center",
     justifyContent: "center",
   },
   errorText: {
-    color: "red",
+    color: colors.error,
     paddingLeft: 10,
     paddingRight: 10,
   },
   link: {
     fontSize: 13,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#023047",
-    color: "grey",
+    borderBottomColor: colors.linkBottom,
+    color: colors.link,
   },
+  simpleText: {
+    color: colors.text
+  }
 });

@@ -1,6 +1,8 @@
 import { TextInput, View, StyleSheet, Pressable } from "react-native";
 import { IconEye } from "./IconEye";
 import { useState } from "react";
+import useThemeColor from "@/hooks/useThemeColor";
+import { ObjectColor } from "@/constants/theme/types";
 
 interface Props {
   placeholder: string;
@@ -23,9 +25,8 @@ export const PasswordInput = ({
     setIsSecure((prev) => !prev);
   };
 
-  const bottomColor = isError ? "red" : "green";
-
-  const styles = getStyles(bottomColor);
+  const { colors } = useThemeColor();
+  const styles = getStyles(isError, colors);
 
   return (
     <View style={styles.viewInput}>
@@ -38,23 +39,24 @@ export const PasswordInput = ({
         onBlur={onBlur}
         onChangeText={(value) => onChange(value)}
         value={value}
-        cursorColor="grey"
+        cursorColor={colors.cursor}
+        placeholderTextColor={colors.placeholder}
       />
       <Pressable onPress={changeSecure}>
-        <IconEye isClose={isSecure} />
+        <IconEye isClose={isSecure} color={colors.icon}/>
       </Pressable>
     </View>
   );
 };
 
-const getStyles = (bottomColor: string) =>
+const getStyles = (isError: boolean, colors: ObjectColor) =>
   StyleSheet.create({
     viewInput: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       width: "80%",
-      borderBottomColor: bottomColor,
+      borderBottomColor: isError ? colors.error : colors.borderInput,
       borderBottomWidth: StyleSheet.hairlineWidth,
       fontSize: 15,
     },
