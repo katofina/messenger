@@ -1,12 +1,11 @@
+import { MenuButton } from "@/components/headerButtons/MenuButton";
+import { SearchButton } from "@/components/headerButtons/searchButton";
 import { store } from "@/redux/Store";
-import { Octicons, SimpleLineIcons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
-import { TouchableOpacity } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 
 export default function RootLayout() {
-
   return (
     <Provider store={store}>
       <SafeAreaProvider>
@@ -17,14 +16,10 @@ export default function RootLayout() {
               headerShown: true,
               headerTitle: "",
               headerRight: () => (
-                <TouchableOpacity>
-                  <Octicons name="search" size={24} color="black" />
-                </TouchableOpacity>
+                <SearchButton />
               ),
               headerLeft: () => (
-                <TouchableOpacity>
-                  <SimpleLineIcons name="menu" size={24} color="black" />
-                </TouchableOpacity>
+                <MenuButton />
               ),
             }}
           />
