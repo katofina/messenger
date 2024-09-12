@@ -6,10 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function initiallScreen() {
   const [auth, setAuth] = useState(false); //from asyncStorage or firebase
 
-  if (auth) return <InitialAuth />
-  else return (
-    <SafeAreaView>
-      <InitialNotAuth />
-    </SafeAreaView>
-  );
+  if (auth) return <InitialAuth />;
+  else
+    return (
+      <SafeAreaView>
+        <InitialNotAuth />
+      </SafeAreaView>
+    );
 }

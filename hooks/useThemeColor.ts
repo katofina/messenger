@@ -1,17 +1,18 @@
-import { useColorScheme } from "react-native";
+import { Store } from "@/redux/Store";
+import { useDispatch, useSelector } from "react-redux";
+import getThemeColor from "./getThemeColor";
+import { ObjectColor, ThemeString } from "@/constants/theme/types";
+import { themeState } from "@/redux/ThemeSlice";
 
-import { Colors } from "@/constants/Colors";
+export default function useThemeColor() {
+    const theme = useSelector((store: Store) => store.themeState.theme);
+    const dispatch = useDispatch();
 
-export function useThemeColor(
-  props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light & keyof typeof Colors.dark,
-) {
-  const theme = useColorScheme() ?? "light";
-  const colorFromProps = props[theme];
+    const colors: ObjectColor = getThemeColor(theme);
 
-  if (colorFromProps) {
-    return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
-  }
-}
+    function changeTheme(theme: ThemeString) {
+        dispatch(themeState.actions.setTheme(theme));
+    };
+
+    return { colors, changeTheme };
+};
