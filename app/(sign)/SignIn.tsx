@@ -124,7 +124,7 @@ const getStyles = (colors: ObjectColor) => StyleSheet.create({
     justifyContent: "center",
   },
   errorText: {
-    color: colors.red,
+    color: colors.error,
     paddingLeft: 10,
     paddingRight: 10,
   },

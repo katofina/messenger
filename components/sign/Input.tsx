@@ -41,5 +41,6 @@ const getStyles = (isError: boolean, colors: ObjectColor) => StyleSheet.create({
     borderBottomColor: isError ? colors.error : colors.borderInput,
     borderBottomWidth: StyleSheet.hairlineWidth,
     fontSize: 15,
+    color: colors.text
   },
 });

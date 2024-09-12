@@ -6,7 +6,13 @@ export type ThemeKeys =
   | "shadowColor"
   | "linkBottom"
   | "error"
-  | "success";
+  | "success"
+  | "button"
+  | "link"
+  | "placeholder"
+  | "cursor"
+  | "borderInput"
+  | "headerBc";
 export type ObjectColor = Record<ThemeKeys, string>;
 export interface Colors {
   light: ObjectColor;
