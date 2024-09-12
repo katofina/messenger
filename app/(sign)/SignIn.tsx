@@ -6,10 +6,11 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-import { EmailReg, PassReg } from "./constants";
 import { Input } from "@/components/sign/Input";
 import { PasswordInput } from "@/components/sign/PasswordInput";
 import { Link } from "expo-router";
+import useThemeColor from "@/hooks/useThemeColor";
+import { ObjectColor } from "@/constants/theme/types";
 
 interface SignInData {
   email: string;
@@ -26,6 +27,9 @@ export default function SignIn() {
   function onSubmit(data: SignInData) {
     console.log(data); //checking email and password from store
   }
+
+  const { colors } = useThemeColor();
+  const styles = getStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +73,7 @@ export default function SignIn() {
           style={styles.button}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text>Sign In</Text>
+          <Text style={styles.simpleText}>Sign In</Text>
         </TouchableOpacity>
         <Link href="/(sign)/SignUp" style={styles.link}>
           You don't have account?
@@ -89,9 +93,9 @@ export default function SignIn() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors: ObjectColor) => StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: colors.background,
     height: "100%",
     alignItems: "center",
     justifyContent: "center",
@@ -99,34 +103,38 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 25,
+    color: colors.text
   },
   form: {
-    shadowColor: "grey",
+    shadowColor: colors.shadowColor,
     elevation: 10,
-    backgroundColor: "white",
+    backgroundColor: colors.background,
     width: "80%",
     alignItems: "center",
     justifyContent: "space-evenly",
     height: 350,
   },
   button: {
-    shadowColor: "grey",
+    shadowColor: colors.shadowColor,
     elevation: 5,
-    backgroundColor: "white",
+    backgroundColor: colors.button,
     width: 150,
     height: 45,
     alignItems: "center",
     justifyContent: "center",
   },
   errorText: {
-    color: "red",
+    color: colors.red,
     paddingLeft: 10,
     paddingRight: 10,
   },
   link: {
     fontSize: 13,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#023047",
-    color: "grey",
+    borderBottomColor: colors.linkBottom,
+    color: colors.link,
   },
+  simpleText: {
+    color: colors.text
+  }
 });

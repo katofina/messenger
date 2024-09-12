@@ -1,3 +1,5 @@
+import { ObjectColor } from "@/constants/theme/types";
+import useThemeColor from "@/hooks/useThemeColor";
 import { TextInput, StyleSheet } from "react-native";
 
 interface Props {
@@ -15,9 +17,8 @@ export const Input = ({
   value,
   isError,
 }: Props) => {
-  const bottomColor = isError ? 'red' : 'green';
-
-  const styles = getStyles(bottomColor);
+  const { colors } = useThemeColor();
+  const styles = getStyles(isError, colors);
 
   return (
     <TextInput
@@ -26,17 +27,18 @@ export const Input = ({
       onBlur={onBlur}
       autoCorrect={false}
       placeholder={placeholder}
+      placeholderTextColor={colors.placeholder}
       onChangeText={(value) => onChange(value)}
       value={value}
-      cursorColor="grey"
+      cursorColor={colors.cursor}
     />
   );
 };
 
-const getStyles = (bottomColor: string) => StyleSheet.create({
+const getStyles = (isError: boolean, colors: ObjectColor) => StyleSheet.create({
   textInput: {
     width: "80%",
-    borderBottomColor: bottomColor,
+    borderBottomColor: isError ? colors.error : colors.borderInput,
     borderBottomWidth: StyleSheet.hairlineWidth,
     fontSize: 15,
   },
