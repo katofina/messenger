@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function initiallScreen() {
-  const [auth, setAuth] = useState(false); //from asyncStorage or firebase
+  const [auth, setAuth] = useState(true); //from asyncStorage or firebase
   const { colors } = useThemeColor();
   const navigation = useNavigation();
 

@@ -62,5 +62,6 @@ const getStyles = (isError: boolean, colors: ObjectColor) =>
     },
     textInput: {
       width: "90%",
+      color: colors.text
     },
   });
