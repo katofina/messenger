@@ -10,10 +10,10 @@ export const colors: Colors = {
     error: "red",
     success: "green",
     button: "#fff",
-    link: "#d2d4d6",
+    link: "#81878c",
     placeholder: "#858585",
-    cursor: "#d2d4d6",
-    borderInput: "#ebebeb",
+    cursor: "#505559",
+    borderInput: "#505559",
     headerBc: "white",
   },
   dark: {

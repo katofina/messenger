@@ -15,9 +15,12 @@ export default function InitialNotAuth() {
   const styles = getStyles(colors);
 
   const navigation = useNavigation();
-  navigation.setOptions({
-    headerShown: false,
-  });
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, [navigation]);
 
   const marginLeft = useSharedValue(0);
   useEffect(() => {
