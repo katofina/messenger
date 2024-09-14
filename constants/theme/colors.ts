@@ -31,6 +31,6 @@ export const colors: Colors = {
     cursor: "#d2d4d6",
     borderInput: "#ebebeb",
     headerBc: "#151719",
-    avatar: '#f0f8ff'
+    avatar: '#2a323b'
   },
 };

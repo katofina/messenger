@@ -22,6 +22,7 @@ export function DrawerContent() {
         <DrawerItem
           icon={() => <Feather name="settings" size={18} color={colors.icon} />}
           label='Settings'
+          labelStyle={styles.label}
           onPress={goToSettings}
         />
       </DrawerContentScrollView>
@@ -31,6 +32,7 @@ export function DrawerContent() {
 const getStyles = (colors: ObjectColor) => StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background
   },
   avatarView: {
     backgroundColor: colors.headerBc,
@@ -41,5 +43,8 @@ const getStyles = (colors: ObjectColor) => StyleSheet.create({
   },
   nick: {
     color: colors.borderInput
+  },
+  label: {
+    color: colors.text
   }
 })
