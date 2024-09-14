@@ -4,9 +4,10 @@ import useThemeColor from "@/hooks/useThemeColor";
 import { useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import auth from "@react-native-firebase/auth";
 
 export default function initiallScreen() {
-  const [auth, setAuth] = useState(true); //from asyncStorage or firebase
+  const [isAuth, setIsAuth] = useState(false);
   const { colors } = useThemeColor();
   const navigation = useNavigation();
 
@@ -18,7 +19,12 @@ export default function initiallScreen() {
     });
   }, [colors]);
 
-  if (auth) return <InitialAuth />;
+  auth().onAuthStateChanged((user) => {
+    if (user) setIsAuth(true)
+    else setIsAuth(false)
+  });
+
+  if (isAuth) return <InitialAuth />;
   else
     return (
       <SafeAreaView>

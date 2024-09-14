@@ -13,6 +13,8 @@ import { useState } from "react";
 import { Link } from "expo-router";
 import useThemeColor from "@/hooks/useThemeColor";
 import { ObjectColor } from "@/constants/theme/types";
+import auth from "@react-native-firebase/auth";
+import { router } from "expo-router";
 
 interface SignUpData {
   confirm_password: string;
@@ -29,10 +31,17 @@ export default function SignUp() {
   } = useForm<SignUpData>();
 
   const [isConfirmPass, setIsConfirPass] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   function onSubmit(data: SignUpData) {
-    if (data.confirm_password === data.password) console.log(data);
-    else setIsConfirPass(false);
+    if (data.confirm_password === data.password) {
+      try {
+        auth().createUserWithEmailAndPassword(data.email, data.password);
+        router.replace('/')
+      } catch (error) {
+        setError(error as string);
+      }
+    } else setIsConfirPass(false);
   }
 
   const { colors } = useThemeColor();
@@ -145,52 +154,54 @@ export default function SignUp() {
       {isConfirmPass || (
         <Text style={styles.errorText}>*Passwords are not matched.</Text>
       )}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </SafeAreaView>
   );
 }
 
-const getStyles = (colors: ObjectColor) => StyleSheet.create({
-  container: {
-    backgroundColor: colors.background,
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 20,
-  },
-  text: {
-    fontSize: 25,
-    color: colors.text
-  },
-  form: {
-    shadowColor: colors.shadowColor,
-    elevation: 10,
-    backgroundColor: colors.background,
-    width: "80%",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-    height: 350,
-  },
-  button: {
-    shadowColor: colors.shadowColor,
-    elevation: 5,
-    backgroundColor: colors.button,
-    width: 150,
-    height: 45,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  errorText: {
-    color: colors.error,
-    paddingLeft: 10,
-    paddingRight: 10,
-  },
-  link: {
-    fontSize: 13,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.linkBottom,
-    color: colors.link,
-  },
-  simpleText: {
-    color: colors.text
-  }
-});
+const getStyles = (colors: ObjectColor) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.background,
+      height: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 20,
+    },
+    text: {
+      fontSize: 25,
+      color: colors.text,
+    },
+    form: {
+      shadowColor: colors.shadowColor,
+      elevation: 10,
+      backgroundColor: colors.background,
+      width: "80%",
+      alignItems: "center",
+      justifyContent: "space-evenly",
+      height: 350,
+    },
+    button: {
+      shadowColor: colors.shadowColor,
+      elevation: 5,
+      backgroundColor: colors.button,
+      width: 150,
+      height: 45,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    errorText: {
+      color: colors.error,
+      paddingLeft: 10,
+      paddingRight: 10,
+    },
+    link: {
+      fontSize: 13,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.linkBottom,
+      color: colors.link,
+    },
+    simpleText: {
+      color: colors.text,
+    },
+  });
