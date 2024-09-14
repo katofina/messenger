@@ -1,7 +1,7 @@
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Entypo } from "@expo/vector-icons";
-import { Link, useNavigation } from "expo-router";
+import { Link } from "expo-router";
 import { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Animated, {
@@ -13,14 +13,6 @@ import Animated, {
 export default function InitialNotAuth() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
-
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, [navigation]);
 
   const marginLeft = useSharedValue(0);
   useEffect(() => {

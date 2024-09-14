@@ -14,7 +14,8 @@ export const colors: Colors = {
     placeholder: "#858585",
     cursor: "#505559",
     borderInput: "#505559",
-    headerBc: "white",
+    headerBc: "#cccccc",
+    avatar: '#f0f8ff'
   },
   dark: {
     text: "#d2d4d6",
@@ -30,5 +31,6 @@ export const colors: Colors = {
     cursor: "#d2d4d6",
     borderInput: "#ebebeb",
     headerBc: "#151719",
+    avatar: '#2a323b'
   },
 };
