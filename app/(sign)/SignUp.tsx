@@ -37,7 +37,7 @@ export default function SignUp() {
     if (data.confirm_password === data.password) {
       try {
         auth().createUserWithEmailAndPassword(data.email, data.password);
-        router.replace('/')
+        router.replace('/(auth)')
       } catch (error) {
         setError(error as string);
       }

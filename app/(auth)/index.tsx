@@ -1,7 +1,5 @@
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
-import { useNavigation } from "expo-router";
-import { useEffect } from "react";
 import { Text, View, StyleSheet, FlatList } from "react-native";
 
 export default function InitialAuth() {
@@ -9,14 +7,6 @@ export default function InitialAuth() {
   const styles = getStyles(colors);
 
   const data = ["allChats"];
-
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerShown: true,
-    });
-  }, [navigation]);
 
   return (
     <View style={styles.container}>
