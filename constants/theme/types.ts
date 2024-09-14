@@ -12,7 +12,8 @@ export type ThemeKeys =
   | "placeholder"
   | "cursor"
   | "borderInput"
-  | "headerBc";
+  | "headerBc"
+  | "avatar";
 export type ObjectColor = Record<ThemeKeys, string>;
 export interface Colors {
   light: ObjectColor;

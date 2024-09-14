@@ -3,13 +3,14 @@ import useThemeColor from "@/hooks/useThemeColor";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
 import { DrawerToggleButton } from "@react-navigation/drawer";
+import { DrawerContent } from "@/components/drawer/DrawerContent";
 
 export default function authLayout() {
   const { colors } = useThemeColor();
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Drawer initialRouteName="index">
+      <Drawer initialRouteName="index" drawerContent={() => <DrawerContent/>}>
         <Drawer.Screen
           name="index"          
           options={{
