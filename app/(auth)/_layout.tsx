@@ -1,25 +1,28 @@
-import { MenuButton } from "@/components/headerButtons/MenuButton";
 import { SearchButton } from "@/components/headerButtons/SearchButton";
 import useThemeColor from "@/hooks/useThemeColor";
-import { Stack } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Drawer } from "expo-router/drawer";
+import { DrawerToggleButton } from "@react-navigation/drawer";
 
 export default function authLayout() {
   const { colors } = useThemeColor();
 
   return (
-    <Stack initialRouteName="index">
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: true,
-          headerTitle: "",
-          headerStyle: {
-            backgroundColor: colors.headerBc,
-          },
-          headerRight: () => <SearchButton />,
-          headerLeft: () => <MenuButton />,
-        }}
-      />
-    </Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Drawer initialRouteName="index">
+        <Drawer.Screen
+          name="index"          
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerStyle: {
+              backgroundColor: colors.headerBc,
+            },
+            headerRight: () => <SearchButton />,
+            headerLeft: () => <DrawerToggleButton tintColor="#687076"/>,
+          }}
+        />
+      </Drawer>
+    </GestureHandlerRootView>
   );
 }
