@@ -2,17 +2,28 @@ import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Entypo } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import auth from "@react-native-firebase/auth";
+import { router } from "expo-router";
 
 export default function InitialNotAuth() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+
+  const [isAuth, setIsAuth] = useState<boolean>(false);
+  auth().onAuthStateChanged((user) => {
+    if (user) setIsAuth(true);
+    else setIsAuth(false);
+  });
+  useEffect(() => {
+    if (isAuth) router.push("/(auth)");
+  }, [isAuth]);
 
   const marginLeft = useSharedValue(0);
   useEffect(() => {

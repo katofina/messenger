@@ -29,12 +29,9 @@ export default function SignIn() {
   const [error, setError] = useState<string | null>(null);
 
   function onSubmit(data: SignInData) {
-    try {
-      auth().signInWithEmailAndPassword(data.email, data.password);
-      router.replace('/(auth)');
-    } catch (error) {
-      setError(error as string);
-    }
+    auth().signInWithEmailAndPassword(data.email, data.password)
+      .then(() => { router.replace("/(auth)") })
+      .catch((error) => setError(String(error)))
   }
 
   const { colors } = useThemeColor();

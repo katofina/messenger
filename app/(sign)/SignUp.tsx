@@ -9,12 +9,14 @@ import {
 import { EmailReg, NickReg, PassReg } from "./constants";
 import { Input } from "@/components/sign/Input";
 import { PasswordInput } from "@/components/sign/PasswordInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "expo-router";
 import useThemeColor from "@/hooks/useThemeColor";
 import { ObjectColor } from "@/constants/theme/types";
 import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
+import database from "@react-native-firebase/database";
+import getStringRef from "@/functions/firebase/getStringRef";
 
 interface SignUpData {
   confirm_password: string;
@@ -31,17 +33,36 @@ export default function SignUp() {
   } = useForm<SignUpData>();
 
   const [isConfirmPass, setIsConfirPass] = useState(true);
+    const [isExistNick, setIsExistNick] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  let nicknames: Array<string>;
+  useEffect(() => {
+    database().ref('nicknames').once("value")
+      .then(snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          nicknames = Object.values(data);
+        }
+      })
+  },[])
+
   function onSubmit(data: SignUpData) {
-    if (data.confirm_password === data.password) {
-      try {
-        auth().createUserWithEmailAndPassword(data.email, data.password);
-        router.replace('/(auth)')
-      } catch (error) {
-        setError(error as string);
-      }
-    } else setIsConfirPass(false);
+    const equalPass = data.confirm_password === data.password;
+    const isAccessNick = nicknames.includes(data.nickname);
+    console.log(nicknames, isAccessNick);
+    if (equalPass && !isAccessNick) {
+      const stringForRef = getStringRef(data.email);
+      auth()
+        .createUserWithEmailAndPassword(data.email, data.password)
+        .then(() => {
+          router.replace("/(auth)");
+          database().ref(stringForRef).set({nickname: data.nickname});
+          database().ref('nicknames').push(data.nickname);
+        })
+        .catch((error) => setError(String(error)));
+    } else if (!equalPass) setIsConfirPass(false)
+      else setIsExistNick(true);
   }
 
   const { colors } = useThemeColor();
@@ -153,6 +174,9 @@ export default function SignUp() {
       )}
       {isConfirmPass || (
         <Text style={styles.errorText}>*Passwords are not matched.</Text>
+      )}
+      {isExistNick && (
+        <Text style={styles.errorText}>*This nick already exists.</Text>
       )}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </SafeAreaView>
