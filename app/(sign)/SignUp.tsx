@@ -17,6 +17,7 @@ import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
 import database from "@react-native-firebase/database";
 import getStringRef from "@/functions/firebase/getStringRef";
+import { useDispatch } from "react-redux";
 
 interface SignUpData {
   confirm_password: string;
@@ -33,36 +34,38 @@ export default function SignUp() {
   } = useForm<SignUpData>();
 
   const [isConfirmPass, setIsConfirPass] = useState(true);
-    const [isExistNick, setIsExistNick] = useState(false);
+  const [isExistNick, setIsExistNick] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   let nicknames: Array<string>;
   useEffect(() => {
-    database().ref('nicknames').once("value")
-      .then(snapshot => {
+    database()
+      .ref("nicknames")
+      .once("value")
+      .then((snapshot) => {
         const data = snapshot.val();
         if (data) {
           nicknames = Object.values(data);
         }
-      })
-  },[])
+      });
+  }, []);
 
   function onSubmit(data: SignUpData) {
     const equalPass = data.confirm_password === data.password;
     const isAccessNick = nicknames.includes(data.nickname);
-    console.log(nicknames, isAccessNick);
     if (equalPass && !isAccessNick) {
-      const stringForRef = getStringRef(data.email);
       auth()
         .createUserWithEmailAndPassword(data.email, data.password)
-        .then(() => {
+        .then((result) => {
           router.replace("/(auth)");
-          database().ref(stringForRef).set({nickname: data.nickname});
-          database().ref('nicknames').push(data.nickname);
+          database().ref("nicknames").push(data.nickname);
+          return result.user.updateProfile({
+            displayName: data.nickname,
+          });
         })
         .catch((error) => setError(String(error)));
-    } else if (!equalPass) setIsConfirPass(false)
-      else setIsExistNick(true);
+    } else if (!equalPass) setIsConfirPass(false);
+    else setIsExistNick(true);
   }
 
   const { colors } = useThemeColor();

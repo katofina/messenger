@@ -2,7 +2,7 @@ import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Entypo } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
@@ -11,18 +11,24 @@ import Animated, {
 } from "react-native-reanimated";
 import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
+import { useDispatch } from "react-redux";
+import { authState } from "@/redux/AuthSlice";
 
 export default function InitialNotAuth() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+  const dispatch = useDispatch();
 
   const [isAuth, setIsAuth] = useState<boolean>(false);
   auth().onAuthStateChanged((user) => {
-    if (user) setIsAuth(true);
+    if (user) {
+      setIsAuth(true);
+      user.displayName && dispatch(authState.actions.setNick(user.displayName));
+    }
     else setIsAuth(false);
   });
   useEffect(() => {
-    if (isAuth) router.push("/(auth)");
+    if (isAuth) router.replace("/(auth)");
   }, [isAuth]);
 
   const marginLeft = useSharedValue(0);

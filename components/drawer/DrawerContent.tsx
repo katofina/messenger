@@ -6,16 +6,18 @@ import { ObjectColor } from "@/constants/theme/types";
 import { Entypo, Feather } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
+import { useSelector } from "react-redux";
+import { Store } from "@/redux/Store";
 
 export function DrawerContent() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+  const nick = useSelector((store: Store) => store.authState.nick);
 
   function goToSettings() {}
 
   function logOut() {
-    auth().signOut();
-    router.replace('/InitialNotAuth');
+    auth().signOut().then(() => router.replace('/InitialNotAuth'));
   }
 
   return (
@@ -23,7 +25,7 @@ export function DrawerContent() {
       <DrawerContentScrollView>
         <View style={styles.avatarView}>
           <Avatar sizeImg={35} sizeView={80} />
-          <Text style={styles.nick}>Nick</Text>
+          <Text style={styles.nick}>{nick}</Text>
         </View>
         <DrawerItem
           icon={() => <Feather name="settings" size={18} color={colors.icon} />}
