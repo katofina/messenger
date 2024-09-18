@@ -30,7 +30,7 @@ export const Avatar = ({ sizeImg, sizeView }: Props) => {
           setUrl(data.photoUrl);
         }
       });
-  }, []);
+  }, [url]);
 
   return (
     <View style={styles.avatar}>

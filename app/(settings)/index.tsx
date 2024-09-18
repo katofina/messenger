@@ -2,11 +2,10 @@ import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
-import database from "@react-native-firebase/database";
+import * as ImagePicker from "expo-image-picker";
+import uploadPhoto from "@/functions/firebase/uploadPhoto";
 import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
-import storage from '@react-native-firebase/storage';
-import * as ImagePicker from "expo-image-picker";
 
 export default function Settings() {
   const { colors } = useThemeColor();
@@ -22,17 +21,7 @@ export default function Settings() {
     });
 
     if (!result.canceled) {
-      const ref = storage().ref(nick);
-      try {
-        await ref.putFile(result.assets[0].uri);
-        const url = await ref.getDownloadURL();
-        await database().ref(nick).set({
-          photoUrl: url
-        });
-        console.log('success');
-      } catch (error) {
-        console.log(error);
-      };
+      uploadPhoto(result.assets[0].uri, nick);
     };
   };
 
@@ -42,8 +31,8 @@ export default function Settings() {
       quality: 1,
     });
     if (!result.canceled) {
-      database().ref(nick).set({ photo: result.assets[0].uri });
-    }
+      uploadPhoto(result.assets[0].uri, nick);
+    };
   };
 
   return (
