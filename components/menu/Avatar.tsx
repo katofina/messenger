@@ -2,7 +2,7 @@ import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Store } from "@/redux/Store";
 import { AntDesign } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Image } from "react-native";
 import { useSelector } from "react-redux";
@@ -15,27 +15,29 @@ interface Props {
 export const Avatar = ({ sizeImg, sizeView }: Props) => {
   const { colors } = useThemeColor();
   const styles = getStyles(colors, sizeView);
-  const nick = useSelector((store: Store) => {
-    return store.authState.nick;
+  const stringRef = useSelector((store: Store) => {
+    return store.authState.stringRef;
   });
 
   const [url, setUrl] = useState<string | null>(null);
-  useEffect(() => {
-    database()
-      .ref(nick)
-      .once("value")
-      .then((snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          setUrl(data.photoUrl);
-        }
-      });
-  }, [url]);
+  database()
+    .ref(stringRef)
+    .on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setUrl(data.photoUrl);
+      }
+    });
 
   return (
     <View style={styles.avatar}>
       {url ? (
-        <Image source={{ uri: url }} height={sizeImg} width={sizeImg} style={styles.image} />
+        <Image
+          source={{ uri: url }}
+          height={sizeImg}
+          width={sizeImg}
+          style={styles.image}
+        />
       ) : (
         <AntDesign name="user" size={sizeImg - 20} color={colors.icon} />
       )}
@@ -55,6 +57,6 @@ const getStyles = (colors: ObjectColor, sizeView: number) =>
       backgroundColor: colors.avatar,
     },
     image: {
-      borderRadius: 50
-    }
+      borderRadius: 50,
+    },
   });

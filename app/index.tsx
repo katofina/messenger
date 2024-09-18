@@ -11,7 +11,8 @@ export default function Index() {
   auth().onAuthStateChanged((user) => {
     if (user) {
       setIsAuth(true);
-      user.displayName && dispatch(authState.actions.setNick(user.displayName));
+      dispatch(authState.actions.setNick(user.displayName!));
+      dispatch(authState.actions.setEmail(user.email!));
     } else setIsAuth(false);
   });
 

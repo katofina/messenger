@@ -6,11 +6,14 @@ import * as ImagePicker from "expo-image-picker";
 import uploadPhoto from "@/functions/firebase/uploadPhoto";
 import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
+import { useState } from "react";
+import { ModalInput } from "@/components/menu/ModalInput";
 
 export default function Settings() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
-  const nick = useSelector((store: Store) => store.authState.nick);
+  const stringRef = useSelector((store: Store) => store.authState.stringRef);
+  const [isModal, setIsModal] = useState(false);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -21,8 +24,8 @@ export default function Settings() {
     });
 
     if (!result.canceled) {
-      uploadPhoto(result.assets[0].uri, nick);
-    };
+      uploadPhoto(result.assets[0].uri, stringRef);
+    }
   };
 
   const pickPhoto = async () => {
@@ -31,8 +34,12 @@ export default function Settings() {
       quality: 1,
     });
     if (!result.canceled) {
-      uploadPhoto(result.assets[0].uri, nick);
-    };
+      uploadPhoto(result.assets[0].uri, stringRef);
+    }
+  };
+
+  const changeNickname = () => {
+    setIsModal(true);
   };
 
   return (
@@ -45,10 +52,11 @@ export default function Settings() {
         <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
         <Text style={styles.text}>Set Profile Photo from Camera</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={changeNickname}>
         <Feather name="edit-3" size={24} color={colors.icon} />
         <Text style={styles.text}>Edit Nickname</Text>
       </TouchableOpacity>
+      <ModalInput isOpen={isModal} close={() => setIsModal(false)} />
     </View>
   );
 }

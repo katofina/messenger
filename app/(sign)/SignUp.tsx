@@ -42,9 +42,7 @@ export default function SignUp() {
       .once("value")
       .then((snapshot) => {
         const data = snapshot.val();
-        if (data) {
-          nicknames = Object.values(data);
-        }
+        data && (nicknames = Object.values(data));
       });
   }, []);
 
