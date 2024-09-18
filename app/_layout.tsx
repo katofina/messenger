@@ -12,6 +12,7 @@ export default function RootLayout() {
           <Stack.Screen name="InitialNotAuth" />
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(sign)" />
+          <Stack.Screen name="(settings)" />
         </Stack>
       </SafeAreaProvider>
     </Provider>

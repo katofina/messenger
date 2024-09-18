@@ -16,8 +16,6 @@ import { ObjectColor } from "@/constants/theme/types";
 import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
 import database from "@react-native-firebase/database";
-import getStringRef from "@/functions/firebase/getStringRef";
-import { useDispatch } from "react-redux";
 
 interface SignUpData {
   confirm_password: string;
@@ -57,7 +55,7 @@ export default function SignUp() {
       auth()
         .createUserWithEmailAndPassword(data.email, data.password)
         .then((result) => {
-          router.replace("/(auth)");
+          router.replace("/");
           database().ref("nicknames").push(data.nickname);
           return result.user.updateProfile({
             displayName: data.nickname,

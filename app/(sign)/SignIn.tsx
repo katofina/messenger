@@ -30,7 +30,7 @@ export default function SignIn() {
 
   function onSubmit(data: SignInData) {
     auth().signInWithEmailAndPassword(data.email, data.password)
-      .then(() => { router.replace("/(auth)") })
+      .then(() => { router.replace("/") })
       .catch((error) => setError(String(error)))
   }
 
