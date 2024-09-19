@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { authState } from "@/redux/AuthSlice";
 import deleteNickname from "@/functions/firebase/deleteNickname";
 import { Store } from "@/redux/Store";
+import { AntDesign } from "@expo/vector-icons";
 
 interface Props {
   isOpen: boolean;
@@ -88,7 +89,12 @@ export const ModalInput = ({ isOpen, close }: Props) => {
       ]}
     >
       <View style={styles.container}>
-        <Text style={styles.text}>Enter a new nickname:</Text>
+        <View style={styles.titleView}>
+          <TouchableOpacity style={styles.close} onPress={close}>
+            <AntDesign name="close" size={26} color={colors.icon} />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.title}>Enter a new nickname:</Text>
         <Controller
           control={control}
           rules={{
@@ -114,16 +120,16 @@ export const ModalInput = ({ isOpen, close }: Props) => {
             <Text style={styles.textButton}>Change</Text>
           </TouchableOpacity>
         </View>
-        {errors.nickname && (
-          <Text style={styles.errorText}>
-            *Nickname should contain at least 6 characters.
-          </Text>
-        )}
-        {isExistNick && (
-          <Text style={styles.errorText}>*This nick already exists.</Text>
-        )}
-        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
+      {errors.nickname && (
+        <Text style={styles.errorText}>
+          *Nickname should contain at least 6 characters.
+        </Text>
+      )}
+      {isExistNick && (
+        <Text style={styles.errorText}>*This nick already exists.</Text>
+      )}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </Animated.View>
   );
 };
@@ -142,13 +148,27 @@ const getStyles = (colors: ObjectColor) =>
       backgroundColor: colors.background,
       shadowColor: colors.shadowColor,
       elevation: 10,
-      justifyContent: "center",
+      justifyContent: "flex-start",
       alignItems: "center",
-      gap: 10,
+      gap: 20,
     },
-    text: {
+    titleView: {
+      flexDirection: "row",
+      justifyContent: "center",
+      width: "100%",
+      paddingTop: 20,
+    },
+    title: {
       color: colors.text,
-      fontSize: 25,
+      fontSize: 20,
+    },
+    close: {
+      position: "absolute",
+      top: 10,
+      right: 10,
+      height: 30,
+      width: 30,
+      alignItems: "center",
     },
     viewButton: {
       width: "100%",
