@@ -14,17 +14,21 @@ export function DrawerContent() {
   const styles = getStyles(colors);
   const nick = useSelector((store: Store) => store.authState.nick);
 
-  function goToSettings() {}
+  function goToSettings() {
+    router.navigate("/(settings)");
+  }
 
   function logOut() {
-    auth().signOut().then(() => router.replace('/InitialNotAuth'));
+    auth()
+      .signOut()
+      .then(() => router.replace("/InitialNotAuth"));
   }
 
   return (
     <View style={styles.container}>
       <DrawerContentScrollView>
         <View style={styles.avatarView}>
-          <Avatar sizeImg={35} sizeView={80} />
+          <Avatar sizeImg={80} sizeView={80} />
           <Text style={styles.nick}>{nick}</Text>
         </View>
         <DrawerItem
@@ -33,12 +37,12 @@ export function DrawerContent() {
           labelStyle={styles.label}
           onPress={goToSettings}
         />
-          <DrawerItem
-            icon={() => <Entypo name="log-out" size={18} color={colors.icon} />}
-            label="Log Out"
-            labelStyle={styles.label}
-            onPress={logOut}
-          />
+        <DrawerItem
+          icon={() => <Entypo name="log-out" size={18} color={colors.icon} />}
+          label="Log Out"
+          labelStyle={styles.label}
+          onPress={logOut}
+        />
       </DrawerContentScrollView>
     </View>
   );
