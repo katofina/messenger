@@ -26,7 +26,7 @@ import { AntDesign } from "@expo/vector-icons";
 
 interface Props {
   isOpen: boolean;
-  close: () => void;
+  close: (isChange: boolean) => void;
 }
 
 interface InputData {
@@ -70,7 +70,7 @@ export const ModalInput = ({ isOpen, close }: Props) => {
       await auth()
         .currentUser?.updateProfile({ displayName: data.nickname })
         .then(() => {
-          close();
+          close(true);
           setIsExistNick(false);
           database().ref("nicknames").push(data.nickname);
           dispatch(authState.actions.setNick(data.nickname));
@@ -90,7 +90,7 @@ export const ModalInput = ({ isOpen, close }: Props) => {
     >
       <View style={styles.container}>
         <View style={styles.titleView}>
-          <TouchableOpacity style={styles.close} onPress={close}>
+          <TouchableOpacity style={styles.close} onPress={() => close(false)}>
             <AntDesign name="close" size={26} color={colors.icon} />
           </TouchableOpacity>
         </View>

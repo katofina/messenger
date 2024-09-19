@@ -14,6 +14,8 @@ import { useState } from "react";
 import { ModalInput } from "@/components/menu/ModalInput";
 import { ModalTheme } from "@/components/menu/ModalTheme";
 import { themeState } from "@/redux/ThemeSlice";
+import { Hint } from "@/components/Hint";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function Settings() {
   const { colors } = useThemeColor();
@@ -27,6 +29,24 @@ export default function Settings() {
   const [isThemeModal, setIsThemeModal] = useState(false);
   const dispatch = useDispatch();
 
+  const uploadAndShow = async(uri: string) => {
+    const isUpload: null | string = await uploadPhoto(
+        uri,
+        stringRef,
+      );
+      isUpload
+        ? setHint({
+            color: colors.error,
+            text: isUpload,
+            isOpen: true,
+          })
+        : setHint({
+            color: colors.success,
+            text: "Photo is successfully uploaded.",
+            isOpen: true,
+          });
+  }
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -36,7 +56,7 @@ export default function Settings() {
     });
 
     if (!result.canceled) {
-      uploadPhoto(result.assets[0].uri, stringRef);
+      uploadAndShow(result.assets[0].uri);
     }
   };
 
@@ -46,12 +66,18 @@ export default function Settings() {
       quality: 1,
     });
     if (!result.canceled) {
-      uploadPhoto(result.assets[0].uri, stringRef);
+      uploadAndShow(result.assets[0].uri);
     }
   };
 
-  const changeNickname = () => {
+  const openInput = () => {
     setIsInputModal(true);
+  };
+  const changeName = (isChanged: boolean) => {
+    setIsInputModal(false);
+    setTimeout(() => {
+      isChanged && setHint({ color: colors.success, text: 'Nickname is successfully updated.', isOpen: true })
+    }, 1000);
   };
 
   const changeTheme = () => {
@@ -63,38 +89,53 @@ export default function Settings() {
     setIsThemeModal(false);
   }
 
+  const [hint, setHint] = useState({ color: "", text: "", isOpen: false });
+  const closeHint = () =>
+    setHint((prev) => Object.assign(prev, { isOpen: false }));
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
-        <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
-        <Text style={styles.text}>Set Profile Photo from Galery</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={pickPhoto}>
-        <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
-        <Text style={styles.text}>Set Profile Photo from Camera</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={changeNickname}>
-        <Feather name="edit-3" size={24} color={colors.icon} />
-        <Text style={styles.text}>Edit Nickname</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={changeTheme}>
-        <MaterialCommunityIcons
-          name="theme-light-dark"
-          size={24}
-          color={colors.icon}
+    <GestureHandlerRootView>
+      <View style={styles.container}>
+        <Hint
+          bcColor={hint.color}
+          text={hint.text}
+          isOpen={hint.isOpen}
+          close={closeHint}
         />
-        <Text style={styles.text}>Change Theme</Text>
-      </TouchableOpacity>
-      <ModalInput isOpen={isInputModal} close={() => setIsInputModal(false)} />
-      <ModalTheme
-        isOpen={isThemeModal}
-        close={() => setIsThemeModal(false)}
-        data={["system", "dark", "light"]}
-        title="Choose theme:"
-        active={theme}
-        onChange={onChangeTheme}
-      />
-    </View>
+        <TouchableOpacity style={styles.button} onPress={pickImage}>
+          <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
+          <Text style={styles.text}>Set Profile Photo from Galery</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={pickPhoto}>
+          <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
+          <Text style={styles.text}>Set Profile Photo from Camera</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={openInput}>
+          <Feather name="edit-3" size={24} color={colors.icon} />
+          <Text style={styles.text}>Edit Nickname</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={changeTheme}>
+          <MaterialCommunityIcons
+            name="theme-light-dark"
+            size={24}
+            color={colors.icon}
+          />
+          <Text style={styles.text}>Change Theme</Text>
+        </TouchableOpacity>
+        <ModalInput
+          isOpen={isInputModal}
+          close={changeName}
+        />
+        <ModalTheme
+          isOpen={isThemeModal}
+          close={() => setIsThemeModal(false)}
+          data={["system", "dark", "light"]}
+          title="Choose theme:"
+          active={theme}
+          onChange={onChangeTheme}
+        />
+      </View>
+    </GestureHandlerRootView>
   );
 }
 

@@ -15,7 +15,6 @@ import {
 import { useEffect } from "react";
 import useThemeColor from "@/hooks/useThemeColor";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
-import { current } from "@reduxjs/toolkit";
 
 interface Props {
   isOpen: boolean;
@@ -59,8 +58,8 @@ export const ModalTheme = ({
             <AntDesign name="close" size={26} color={colors.icon} />
           </TouchableOpacity>
         </View>
-        {data.map((item) => (
-          <Pressable style={styles.button} onPress={() => onChange(item)}>
+        {data.map((item, index) => (
+          <Pressable key={index} style={styles.button} onPress={() => onChange(item)}>
             {item === active ? (
               <Fontisto name="radio-btn-active" size={18} color={colors.icon} />
             ) : (

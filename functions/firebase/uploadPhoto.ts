@@ -9,8 +9,8 @@ export default async function uploadPhoto(uri: string, stringRef: string) {
     await database().ref(stringRef).set({
       photoUrl: url,
     });
-    console.log("success");
+    return null;
   } catch (error) {
-    console.log(error);
+    return error as string;
   }
 }
