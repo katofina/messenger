@@ -28,11 +28,11 @@ export default function SignIn() {
   } = useForm<SignInData>();
   const [error, setError] = useState<string | null>(null);
 
-  function onSubmit(data: SignInData) {
-    auth().signInWithEmailAndPassword(data.email, data.password)
+  function onSubmit({email, password}: SignInData) {
+    auth().signInWithEmailAndPassword(email, password)
       .then(() => { router.replace("/") })
-      .catch((error) => setError(String(error)))
-  }
+      .catch((error) => { setError(String(error)) });
+  };
 
   const { colors } = useThemeColor();
   const styles = getStyles(colors);

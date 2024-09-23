@@ -5,12 +5,14 @@ export interface AuthState {
   nick: string;
   email: string;
   stringRef: string;
-}
+  photoURL: string;
+};
 
 const initialState: AuthState = {
   nick: '',
   email: '',
   stringRef: '',
+  photoURL: '',
 };
 
 export const authState = createSlice({
@@ -23,6 +25,9 @@ export const authState = createSlice({
     setEmail: (state, action: PayloadAction<string>) => {
       state.email = action.payload;
       state.stringRef = getStringRef(action.payload);
+    },
+    setPhoto: (state, action: PayloadAction<string>) => {
+      state.photoURL = action.payload;
     },
   },
 });

@@ -27,11 +27,11 @@ import { AntDesign } from "@expo/vector-icons";
 interface Props {
   isOpen: boolean;
   close: (isChange: boolean) => void;
-}
+};
 
 interface InputData {
   nickname: string;
-}
+};
 
 export const ModalInput = ({ isOpen, close }: Props) => {
   const { colors } = useThemeColor();
