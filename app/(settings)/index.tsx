@@ -16,12 +16,14 @@ import { ModalTheme } from "@/components/menu/ModalTheme";
 import { themeState } from "@/redux/ThemeSlice";
 import { Hint } from "@/components/Hint";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { authState } from "@/redux/AuthSlice";
+import database from "@react-native-firebase/database";
 
 export default function Settings() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
 
-  const stringRef = useSelector((store: Store) => store.authState.stringRef);
+  const user = useSelector((store: Store) => store.authState);
 
   const [isInputModal, setIsInputModal] = useState(false);
 
@@ -29,23 +31,26 @@ export default function Settings() {
   const [isThemeModal, setIsThemeModal] = useState(false);
   const dispatch = useDispatch();
 
-  const uploadAndShow = async(uri: string) => {
-    const isUpload: null | string = await uploadPhoto(
-        uri,
-        stringRef,
-      );
-      isUpload
-        ? setHint({
-            color: colors.error,
-            text: isUpload,
-            isOpen: true,
-          })
-        : setHint({
-            color: colors.success,
-            text: "Photo is successfully uploaded.",
-            isOpen: true,
-          });
-  }
+  const uploadAndShow = async (uri: string) => {
+    const isUpload = await uploadPhoto(uri, user.stringRef);
+    if (isUpload.isSuccess) {
+      setHint({
+        color: colors.success,
+        text: "Photo is successfully uploaded.",
+        isOpen: true,
+      });
+      dispatch(authState.actions.setPhoto(isUpload.url!));//middleware
+      database()
+            .ref("nicknames/" + user.nick)
+            .update({photoURL: isUpload.url});
+    } else {
+      setHint({
+        color: colors.error,
+        text: isUpload.error!,
+        isOpen: true,
+      });
+    }
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -76,7 +81,12 @@ export default function Settings() {
   const changeName = (isChanged: boolean) => {
     setIsInputModal(false);
     setTimeout(() => {
-      isChanged && setHint({ color: colors.success, text: 'Nickname is successfully updated.', isOpen: true })
+      isChanged &&
+        setHint({
+          color: colors.success,
+          text: "Nickname is successfully updated.",
+          isOpen: true,
+        });
     }, 1000);
   };
 
@@ -122,10 +132,7 @@ export default function Settings() {
           />
           <Text style={styles.text}>Change Theme</Text>
         </TouchableOpacity>
-        <ModalInput
-          isOpen={isInputModal}
-          close={changeName}
-        />
+        <ModalInput isOpen={isInputModal} close={changeName} />
         <ModalTheme
           isOpen={isThemeModal}
           close={() => setIsThemeModal(false)}

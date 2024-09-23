@@ -16,6 +16,9 @@ import { ObjectColor } from "@/constants/theme/types";
 import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
 import database from "@react-native-firebase/database";
+import getStringRef from "@/functions/firebase/getStringRef";
+import { useDispatch } from "react-redux";
+import { authState } from "@/redux/AuthSlice";
 
 interface SignUpData {
   confirm_password: string;
@@ -34,6 +37,7 @@ export default function SignUp() {
   const [isConfirmPass, setIsConfirPass] = useState(true);
   const [isExistNick, setIsExistNick] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch();
 
   let nicknames: Array<string>;
   useEffect(() => {
@@ -48,13 +52,15 @@ export default function SignUp() {
 
   function onSubmit(data: SignUpData) {
     const equalPass = data.confirm_password === data.password;
-    const isAccessNick = nicknames.includes(data.nickname);
+    const isAccessNick = nicknames ? nicknames.includes(data.nickname) : false;
     if (equalPass && !isAccessNick) {
       auth()
         .createUserWithEmailAndPassword(data.email, data.password)
         .then((result) => {
+          dispatch(authState.actions.setNick(data.nickname));
           router.replace("/");
-          database().ref("nicknames").push(data.nickname);
+          const stringRef = getStringRef(data.email);
+          database().ref("nicknames/" + data.nickname).set({ email: stringRef, nickname: data.nickname });
           return result.user.updateProfile({
             displayName: data.nickname,
           });

@@ -2,11 +2,9 @@ import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Store } from "@/redux/Store";
 import { AntDesign } from "@expo/vector-icons";
-import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Image } from "react-native";
 import { useSelector } from "react-redux";
-import database from "@react-native-firebase/database";
 interface Props {
   sizeImg: number;
   sizeView: number;
@@ -15,25 +13,14 @@ interface Props {
 export const Avatar = ({ sizeImg, sizeView }: Props) => {
   const { colors } = useThemeColor();
   const styles = getStyles(colors, sizeView);
-  const stringRef = useSelector((store: Store) => {
-    return store.authState.stringRef;
-  });
 
-  const [url, setUrl] = useState<string | null>(null);
-  database()
-    .ref(stringRef)
-    .on("value", (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setUrl(data.photoUrl);
-      }
-    });
+  const photoURL = useSelector((store: Store) => store.authState.photoURL);
 
   return (
     <View style={styles.avatar}>
-      {url ? (
+      {photoURL ? (
         <Image
-          source={{ uri: url }}
+          source={{ uri: photoURL }}
           height={sizeImg}
           width={sizeImg}
           style={styles.image}
