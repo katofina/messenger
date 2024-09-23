@@ -12,11 +12,11 @@ export default function Index() {
 
   auth().onAuthStateChanged((user) => {
     if (user) {
+      console.log(user);
       setIsAuth(true);
-      dispatch(authState.actions.setNick(user.displayName!));
+      user.displayName && dispatch(authState.actions.setNick(user.displayName!));
       dispatch(authState.actions.setEmail(user.email!));
       dispatch(authState.actions.setPhoto(user.photoURL!));
-      console.log(user);
     } else setIsAuth(false);
   });
 

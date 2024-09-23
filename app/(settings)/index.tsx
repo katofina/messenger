@@ -17,12 +17,13 @@ import { themeState } from "@/redux/ThemeSlice";
 import { Hint } from "@/components/Hint";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { authState } from "@/redux/AuthSlice";
+import database from "@react-native-firebase/database";
 
 export default function Settings() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
 
-  const stringRef = useSelector((store: Store) => store.authState.stringRef);
+  const user = useSelector((store: Store) => store.authState);
 
   const [isInputModal, setIsInputModal] = useState(false);
 
@@ -31,14 +32,17 @@ export default function Settings() {
   const dispatch = useDispatch();
 
   const uploadAndShow = async (uri: string) => {
-    const isUpload = await uploadPhoto(uri, stringRef);
+    const isUpload = await uploadPhoto(uri, user.stringRef);
     if (isUpload.isSuccess) {
       setHint({
         color: colors.success,
         text: "Photo is successfully uploaded.",
         isOpen: true,
       });
-      dispatch(authState.actions.setPhoto(isUpload.url!));
+      dispatch(authState.actions.setPhoto(isUpload.url!));//middleware
+      database()
+            .ref("nicknames/" + user.nick)
+            .update({photoURL: isUpload.url});
     } else {
       setHint({
         color: colors.error,

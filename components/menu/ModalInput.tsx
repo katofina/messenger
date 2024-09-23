@@ -20,18 +20,17 @@ import { Input } from "../sign/Input";
 import auth from "@react-native-firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { authState } from "@/redux/AuthSlice";
-import deleteNickname from "@/functions/firebase/deleteNickname";
 import { Store } from "@/redux/Store";
 import { AntDesign } from "@expo/vector-icons";
 
 interface Props {
   isOpen: boolean;
   close: (isChange: boolean) => void;
-};
+}
 
 interface InputData {
   nickname: string;
-};
+}
 
 export const ModalInput = ({ isOpen, close }: Props) => {
   const { colors } = useThemeColor();
@@ -46,7 +45,7 @@ export const ModalInput = ({ isOpen, close }: Props) => {
 
   const [error, setError] = useState<string | null>(null);
   const [isExistNick, setIsExistNick] = useState(false);
-  const nick = useSelector((store: Store) => store.authState.nick);
+  const user = useSelector((store: Store) => store.authState);
 
   const {
     control,
@@ -72,9 +71,11 @@ export const ModalInput = ({ isOpen, close }: Props) => {
         .then(() => {
           close(true);
           setIsExistNick(false);
-          database().ref("nicknames").push(data.nickname);
+          database()
+            .ref("nicknames/" + data.nickname)
+            .set({email: user.stringRef, nickname: data.nickname, photoURL: user.photoURL});
+          database().ref("nicknames/" + user.nick).remove();
           dispatch(authState.actions.setNick(data.nickname));
-          deleteNickname(nick);
         })
         .catch((error) => setError(error));
     } else setIsExistNick(true);
