@@ -13,7 +13,9 @@ export type ThemeKeys =
   | "cursor"
   | "borderInput"
   | "headerBc"
-  | "avatar";
+  | "avatar"
+  | "offline"
+  | "online";
 export type ObjectColor = Record<ThemeKeys, string>;
 export interface Colors {
   light: ObjectColor;

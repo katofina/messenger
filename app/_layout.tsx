@@ -13,6 +13,7 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(sign)" />
           <Stack.Screen name="(settings)" />
+          <Stack.Screen name="(search)" />
         </Stack>
       </SafeAreaProvider>
     </Provider>

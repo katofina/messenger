@@ -1,26 +1,23 @@
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
-import { Store } from "@/redux/Store";
 import { AntDesign } from "@expo/vector-icons";
 import { View, StyleSheet } from "react-native";
 import { Image } from "react-native";
-import { useSelector } from "react-redux";
 interface Props {
   sizeImg: number;
   sizeView: number;
+  photo?: string;
 }
 
-export const Avatar = ({ sizeImg, sizeView }: Props) => {
+export const Avatar = ({ sizeImg, sizeView, photo }: Props) => {
   const { colors } = useThemeColor();
   const styles = getStyles(colors, sizeView);
 
-  const photoURL = useSelector((store: Store) => store.authState.photoURL);
-
   return (
     <View style={styles.avatar}>
-      {photoURL ? (
+      {photo ? (
         <Image
-          source={{ uri: photoURL }}
+          source={{ uri: photo }}
           height={sizeImg}
           width={sizeImg}
           style={styles.image}
