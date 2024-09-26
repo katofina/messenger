@@ -1,7 +1,7 @@
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
-import { View, Text, StyleSheet, FlatList } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
+import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import getInfoByNick, { User } from "@/functions/firebase/getInfoByNick";
 import { Avatar } from "@/components/menu/Avatar";
@@ -31,17 +31,31 @@ export default function Search() {
         <FlatList
           data={data}
           renderItem={({ item }) => (
-            <View style={styles.userView}>
-              <Avatar photo={item.photoURL} sizeImg={55} sizeView={55} />
-              <View style={styles.textView}>
-                <Text style={styles.text}>{item.nickname}</Text>
-                {item.online ? (
-                  <Text style={styles.online}>Online</Text>
-                ) : (
-                  <Text style={styles.offline}>Offline</Text>
-                )}
-              </View>
-            </View>
+            <Link
+              href={{
+                pathname: "/(chat)",
+                params: {
+                  nick: item.nickname,
+                  email: item.email,
+                  photo: item.photoURL,
+                  online: item.online,
+                },
+              }}
+              asChild
+              replace={true}
+            >
+              <Pressable style={styles.userView}>
+                <Avatar photo={item.photoURL} sizeImg={55} sizeView={55} />
+                <View style={styles.textView}>
+                  <Text style={styles.text}>{item.nickname}</Text>
+                  {item.online ? (
+                    <Text style={styles.online}>Online</Text>
+                  ) : (
+                    <Text style={styles.offline}>Offline</Text>
+                  )}
+                </View>
+              </Pressable>
+            </Link>
           )}
         />
       </View>

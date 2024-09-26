@@ -8,7 +8,7 @@ export default function SearchLayout() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
 
-  function sendNick(input: string) {
+  function sendInput(input: string) {
     router.setParams({ input });
   };
 
@@ -22,7 +22,7 @@ export default function SearchLayout() {
           headerTintColor: colors.text,
           headerRight: () => (
             <TextInput
-              onChangeText={sendNick}
+              onChangeText={sendInput}
               placeholder="Search"
               placeholderTextColor={colors.placeholder}
               cursorColor={colors.cursor}

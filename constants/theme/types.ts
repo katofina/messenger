@@ -15,7 +15,8 @@ export type ThemeKeys =
   | "headerBc"
   | "avatar"
   | "offline"
-  | "online";
+  | "online"
+  | "chatBc";
 export type ObjectColor = Record<ThemeKeys, string>;
 export interface Colors {
   light: ObjectColor;

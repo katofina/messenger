@@ -14,6 +14,7 @@ export default function RootLayout() {
           <Stack.Screen name="(sign)" />
           <Stack.Screen name="(settings)" />
           <Stack.Screen name="(search)" />
+          <Stack.Screen name="(chat)" />
         </Stack>
       </SafeAreaProvider>
     </Provider>
