@@ -12,7 +12,7 @@ import { Store } from "@/redux/Store";
 export function DrawerContent() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
-  const nick = useSelector((store: Store) => store.authState.nick);
+  const user = useSelector((store: Store) => store.authState);
 
   function goToSettings() {
     router.navigate("/(settings)");
@@ -28,8 +28,8 @@ export function DrawerContent() {
     <View style={styles.container}>
       <DrawerContentScrollView>
         <View style={styles.avatarView}>
-          <Avatar sizeImg={80} sizeView={80} />
-          <Text style={styles.nick}>{nick}</Text>
+          <Avatar photo={user.photoURL} sizeImg={80} sizeView={80} />
+          <Text style={styles.nick}>{user.nick}</Text>
         </View>
         <DrawerItem
           icon={() => <Feather name="settings" size={18} color={colors.icon} />}
@@ -47,6 +47,7 @@ export function DrawerContent() {
     </View>
   );
 }
+
 const getStyles = (colors: ObjectColor) =>
   StyleSheet.create({
     container: {

@@ -19,6 +19,7 @@ import database from "@react-native-firebase/database";
 import getStringRef from "@/functions/firebase/getStringRef";
 import { useDispatch } from "react-redux";
 import { authState } from "@/redux/AuthSlice";
+import includesNick from "@/functions/firebase/includesNick";
 
 interface SignUpData {
   confirm_password: string;
@@ -39,20 +40,9 @@ export default function SignUp() {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
 
-  let nicknames: Array<string>;
-  useEffect(() => {
-    database()
-      .ref("nicknames")
-      .once("value")
-      .then((snapshot) => {
-        const data = snapshot.val();
-        data && (nicknames = Object.values(data));
-      });
-  }, []);
-
-  function onSubmit(data: SignUpData) {
+  async function onSubmit(data: SignUpData) {
     const equalPass = data.confirm_password === data.password;
-    const isAccessNick = nicknames ? nicknames.includes(data.nickname) : false;
+    const isAccessNick = await includesNick(data.nickname);
     if (equalPass && !isAccessNick) {
       auth()
         .createUserWithEmailAndPassword(data.email, data.password)
