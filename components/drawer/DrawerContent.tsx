@@ -8,10 +8,13 @@ import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
 import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
+import useLanguage from "@/hooks/useLanguage";
 
 export function DrawerContent() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+  const lang = useLanguage();
+
   const user = useSelector((store: Store) => store.authState);
 
   function goToSettings() {
@@ -33,13 +36,13 @@ export function DrawerContent() {
         </View>
         <DrawerItem
           icon={() => <Feather name="settings" size={18} color={colors.icon} />}
-          label="Settings"
+          label={lang.settings}
           labelStyle={styles.label}
           onPress={goToSettings}
         />
         <DrawerItem
           icon={() => <Entypo name="log-out" size={18} color={colors.icon} />}
-          label="Log Out"
+          label={lang.logout}
           labelStyle={styles.label}
           onPress={logOut}
         />

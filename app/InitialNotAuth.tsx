@@ -1,4 +1,5 @@
 import { ObjectColor } from "@/constants/theme/types";
+import useLanguage from "@/hooks/useLanguage";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Entypo } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -23,12 +24,14 @@ export default function InitialNotAuth() {
     );
   }, []);
 
+  const lang = useLanguage();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.mainText}>Welcome to Messenger</Text>
+      <Text style={styles.mainText}>{lang.welcome}</Text>
       <Link href="/(sign)/SignUp" asChild>
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.text}>Start</Text>
+          <Text style={styles.text}>{lang.start}</Text>
           <Animated.View style={styles.animView}>
             <Entypo name="chevron-small-right" size={24} color={colors.icon} />
           </Animated.View>

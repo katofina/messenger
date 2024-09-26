@@ -17,6 +17,7 @@ import database from "@react-native-firebase/database";
 import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import divideMessage from "@/functions/firebase/divideMessage";
+import useLanguage from "@/hooks/useLanguage";
 
 export default function Chat() {
   const { email } = useLocalSearchParams();
@@ -29,9 +30,9 @@ export default function Chat() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors, bodyHeight);
 
-  const textRef = useRef<null | string>(null);
+  const [text, setText] = useState<string>("");
   function onChangeText(text: string) {
-    textRef.current = text;
+    setText(text);
   }
 
   const [data, setData] = useState<Array<string>>([]);
@@ -52,18 +53,21 @@ export default function Chat() {
   }, []);
 
   function sendMessage() {
-    if (textRef.current) {
+    if (text.length) {
       const date = new Date().toString();
       const position = data.length + 1;
       database()
         .ref(stringRef + "/chats/" + email + "/messages")
-        .update({ [position]: `${date}/${stringRef}:${textRef.current}` });
+        .update({ [position]: `${date}/${stringRef}:${text}` });
       database()
         .ref(email + "/chats/" + stringRef + "/messages")
-        .update({ [position]: `${date}/${stringRef}:${textRef.current}` });
+        .update({ [position]: `${date}/${stringRef}:${text}` });
+      setText("");
       getMessages();
     }
   }
+
+  const lang = useLanguage();
 
   return (
     <View style={styles.container}>
@@ -106,16 +110,17 @@ export default function Chat() {
             }}
           />
         ) : (
-          <Text>Start your dialog.</Text>
+          <Text>{lang.startDialog}</Text>
         )}
       </View>
       <View style={styles.bottom}>
         <TextInput
           onChangeText={onChangeText}
-          placeholder="Message"
+          placeholder={lang.message}
           placeholderTextColor={colors.placeholder}
           cursorColor={colors.cursor}
           style={styles.input}
+          value={text}
         />
         <TouchableOpacity onPress={sendMessage}>
           <Ionicons name="send" size={24} color={colors.icon} />

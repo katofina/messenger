@@ -2,6 +2,7 @@ import { ObjectColor, ThemeString } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import {
   Feather,
+  FontAwesome,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
@@ -18,6 +19,10 @@ import { Hint } from "@/components/Hint";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { authState } from "@/redux/AuthSlice";
 import database from "@react-native-firebase/database";
+import useLanguage from "@/hooks/useLanguage";
+import { langState } from "@/redux/LanguageSlice";
+import { LanguageString } from "@/constants/language/types";
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Settings() {
   const { colors } = useThemeColor();
@@ -39,7 +44,7 @@ export default function Settings() {
         text: "Photo is successfully uploaded.",
         isOpen: true,
       });
-      dispatch(authState.actions.setPhoto(isUpload.url!));//middleware
+      dispatch(authState.actions.setPhoto(isUpload.url!));
       database()
             .ref("nicknames/" + user.nick)
             .update({photoURL: isUpload.url});
@@ -97,11 +102,24 @@ export default function Settings() {
   function onChangeTheme(item: string) {
     dispatch(themeState.actions.setTheme(item as ThemeString));
     setIsThemeModal(false);
-  }
+    AsyncStorage.setItem('theme', item);
+  };
 
   const [hint, setHint] = useState({ color: "", text: "", isOpen: false });
   const closeHint = () =>
     setHint((prev) => Object.assign(prev, { isOpen: false }));
+
+  const lang = useLanguage();
+  const currLang = useSelector((store: Store) => store.langState.lang);
+  const [isLangModal, setIsLangModal] = useState(false);
+  const changeLang = () => {
+    setIsLangModal(true);
+  };
+  const onChangeLang = (item: string) => {
+    dispatch(langState.actions.setLang(item as LanguageString));
+    setIsLangModal(false);
+    AsyncStorage.setItem('lang', item);
+  };
 
   return (
     <GestureHandlerRootView>
@@ -114,15 +132,15 @@ export default function Settings() {
         />
         <TouchableOpacity style={styles.button} onPress={pickImage}>
           <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
-          <Text style={styles.text}>Set Profile Photo from Galery</Text>
+          <Text style={styles.text}>{lang.setPhotoGalery}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={pickPhoto}>
           <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
-          <Text style={styles.text}>Set Profile Photo from Camera</Text>
+          <Text style={styles.text}>{lang.setPhotoCamera}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={openInput}>
           <Feather name="edit-3" size={24} color={colors.icon} />
-          <Text style={styles.text}>Edit Nickname</Text>
+          <Text style={styles.text}>{lang.editNick}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={changeTheme}>
           <MaterialCommunityIcons
@@ -130,16 +148,28 @@ export default function Settings() {
             size={24}
             color={colors.icon}
           />
-          <Text style={styles.text}>Change Theme</Text>
+          <Text style={styles.text}>{lang.changeTheme}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={changeLang}>
+          <FontAwesome name="language" size={24} color={colors.icon} />
+          <Text style={styles.text}>{lang.changeLang}</Text>
         </TouchableOpacity>
         <ModalInput isOpen={isInputModal} close={changeName} />
         <ModalTheme
           isOpen={isThemeModal}
           close={() => setIsThemeModal(false)}
           data={["system", "dark", "light"]}
-          title="Choose theme:"
+          title={lang.chooseTheme}
           active={theme}
           onChange={onChangeTheme}
+        />
+        <ModalTheme
+          isOpen={isLangModal}
+          close={() => setIsLangModal(false)}
+          data={["english", "russian"]}
+          title={lang.chooseLang}
+          active={currLang}
+          onChange={onChangeLang}
         />
       </View>
     </GestureHandlerRootView>

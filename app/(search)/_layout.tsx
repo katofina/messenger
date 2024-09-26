@@ -3,6 +3,7 @@ import useThemeColor from "@/hooks/useThemeColor";
 import { Stack } from "expo-router";
 import { TextInput, StyleSheet } from "react-native";
 import { router } from "expo-router";
+import useLanguage from "@/hooks/useLanguage";
 
 export default function SearchLayout() {
   const { colors } = useThemeColor();
@@ -11,6 +12,8 @@ export default function SearchLayout() {
   function sendInput(input: string) {
     router.setParams({ input });
   };
+
+  const lang = useLanguage();
 
   return (
     <Stack initialRouteName="index">
@@ -23,7 +26,7 @@ export default function SearchLayout() {
           headerRight: () => (
             <TextInput
               onChangeText={sendInput}
-              placeholder="Search"
+              placeholder={lang.search}
               placeholderTextColor={colors.placeholder}
               cursorColor={colors.cursor}
               style={styles.input}

@@ -14,6 +14,7 @@ import { ObjectColor } from "@/constants/theme/types";
 import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
 import { useState } from "react";
+import useLanguage from "@/hooks/useLanguage";
 
 interface SignInData {
   email: string;
@@ -36,10 +37,11 @@ export default function SignIn() {
 
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+  const lang = useLanguage();
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Sign In</Text>
+      <Text style={styles.text}>{lang.signIn}</Text>
       <View style={styles.form}>
         <Controller
           control={control}
@@ -48,7 +50,7 @@ export default function SignIn() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
-              placeholder="Email"
+              placeholder={lang.email}
               onChange={onChange}
               value={value}
               onBlur={onBlur}
@@ -65,7 +67,7 @@ export default function SignIn() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <PasswordInput
-              placeholder="Password"
+              placeholder={lang.password}
               onBlur={onBlur}
               onChange={(value) => onChange(value)}
               value={value}
@@ -79,20 +81,20 @@ export default function SignIn() {
           style={styles.button}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text style={styles.simpleText}>Sign In</Text>
+          <Text style={styles.simpleText}>{lang.signIn}</Text>
         </TouchableOpacity>
         <Link href="/(sign)/SignUp" style={styles.link}>
-          You don't have account?
+          {lang.youDonHaveAccount}
         </Link>
       </View>
       {errors.email && (
         <Text style={styles.errorText}>
-          *You need to enter email to sign in.
+          {lang.errorEnterEmail}
         </Text>
       )}
       {errors.password && (
         <Text style={styles.errorText}>
-          *You need to enter password to sign in.
+          {lang.errorEnterPass}
         </Text>
       )}
       {error && <Text style={styles.errorText}>{error}</Text>}
