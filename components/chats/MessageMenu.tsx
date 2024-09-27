@@ -14,9 +14,10 @@ interface Prop {
   stringRef: string;
   position: string;
   closeMenu: () => void;
+  copy: () => void;
 };
 
-export const MessageMenu = ({ isOpen, layoutY, stringRef, position, closeMenu }: Prop) => {
+export const MessageMenu = ({ isOpen, layoutY, stringRef, position, closeMenu, copy }: Prop) => {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
   const lang = useLanguage();
@@ -43,9 +44,6 @@ export const MessageMenu = ({ isOpen, layoutY, stringRef, position, closeMenu }:
       .ref(email + "/chats/" + stringRef + "/messages")
       .update({ [position]: null });
   };
-  function copy() {
-    closeMenu();
-  };
 
   return (
     <Animated.View style={[styles.container, {transform: [{translateX}], top: layoutY - headerHeight}]}>
@@ -71,6 +69,7 @@ const getStyles = (colors: ObjectColor) => StyleSheet.create({
     shadowColor: colors.shadowColor,
     elevation: 10,
     width: 150,
+    zIndex: 10
   },
   button: {
     height: 40,

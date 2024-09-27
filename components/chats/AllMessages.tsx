@@ -7,11 +7,13 @@ import {
   StyleSheet,
   Pressable,
   GestureResponderEvent,
-  View,
   useWindowDimensions,
 } from "react-native";
 import { MessageMenu } from "./MessageMenu";
 import { useRef, useState } from "react";
+import * as Clipboard from "expo-clipboard";
+import { Hint } from "../Hint";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 interface Props {
   data: string[][];
@@ -20,7 +22,7 @@ interface Props {
 
 export const AllMessages = ({ data, stringRef }: Props) => {
   const { colors } = useThemeColor();
-  const {height, width} = useWindowDimensions();
+  const { height, width } = useWindowDimensions();
   const styles = getStyles(colors, height, width);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -36,8 +38,18 @@ export const AllMessages = ({ data, stringRef }: Props) => {
     setIsOpen(false);
   }
 
+  async function copy() {
+    const message = data.find((item) => item[0] === position.current)!;
+    const {text} = divideMessage(message[1]);
+    await Clipboard.setStringAsync(text);
+    setIsHint(true);
+    closeMenu();
+  }
+  const [isHint, setIsHint] = useState(false);
+  const closeHint = () => setIsHint(false);
+
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView>
       <FlatList
         contentContainerStyle={styles.flatList}
         data={data}
@@ -87,17 +99,21 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         stringRef={stringRef}
         position={position.current}
         closeMenu={closeMenu}
+        copy={copy}
       />
-      {isOpen && <Pressable style={styles.overlay} onPress={closeMenu}/>}
-    </View>
+      {isOpen && <Pressable style={styles.overlay} onPress={closeMenu} />}
+      <Hint
+        bcColor={colors.success}
+        text={"Successfully copy to clipboard."}
+        isOpen={isHint}
+        close={closeHint}
+      />
+    </GestureHandlerRootView>
   );
 };
 
 const getStyles = (colors: ObjectColor, height: number, width: number) =>
   StyleSheet.create({
-    container: {
-      position: 'relative'
-    },
     flatList: {
       gap: 10,
     },
@@ -122,8 +138,9 @@ const getStyles = (colors: ObjectColor, height: number, width: number) =>
       backgroundColor: "transparent",
       height: height,
       width: width,
-      position: 'absolute',
+      position: "absolute",
       top: 0,
-      left: 0
+      left: 0,
+      zIndex: 0,
     },
   });
