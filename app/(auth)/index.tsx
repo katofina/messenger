@@ -63,8 +63,10 @@ export default function InitialAuth() {
             if (userData) {
               const info: UserInfo = userData.info;
               let lastMessage = null;
-              if (userData.messages)
-                lastMessage = divideMessage(userData.messages.at(-1)!);
+              if (userData.messages) {
+                const messages = Object.values(userData.messages);
+                lastMessage = divideMessage(messages.at(-1)!);
+              }
               return (
                 <Link
                   href={{

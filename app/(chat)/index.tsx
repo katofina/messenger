@@ -8,7 +8,6 @@ import {
   TextInput,
   useWindowDimensions,
   TouchableOpacity,
-  FlatList,
   Text,
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -16,8 +15,8 @@ import { useEffect, useRef, useState } from "react";
 import database from "@react-native-firebase/database";
 import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
-import divideMessage from "@/functions/firebase/divideMessage";
 import useLanguage from "@/hooks/useLanguage";
+import { AllMessages } from "@/components/chats/AllMessages";
 
 export default function Chat() {
   const { email } = useLocalSearchParams();
@@ -35,16 +34,25 @@ export default function Chat() {
     setText(text);
   }
 
-  const [data, setData] = useState<Array<string>>([]);
+  const lastSave = useRef('0');
+
+  const [data, setData] = useState<string[][]>([]);
   function getMessages() {
     database()
       .ref(stringRef + "/chats/" + email + "/messages")
       .on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          const values: string[] = Object.values(data);
-          const messages = values.filter((item) => item !== null);
+          const values: string[][] = Object.entries(data);
+          const messages = values.filter((item) => item[1] !== null);
           setData(messages);
+        }
+      });
+    database().ref(email + "/chats/" + stringRef + "/messages").on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const values: string[] = Object.keys(data);
+          lastSave.current = values.at(-1)!;
         }
       });
   }
@@ -53,17 +61,18 @@ export default function Chat() {
   }, []);
 
   function sendMessage() {
+    const lastPosition = data.length ? Object.keys(data).at(-1) : '0';
     if (text.length) {
       const date = new Date().toString();
-      const position = data.length + 1;
+      const position = lastSave.current > lastPosition! ? Number(lastSave.current) + 1 : Number(lastPosition!) + 1;
       database()
         .ref(stringRef + "/chats/" + email + "/messages")
         .update({ [position]: `${date}/${stringRef}:${text}` });
       database()
         .ref(email + "/chats/" + stringRef + "/messages")
         .update({ [position]: `${date}/${stringRef}:${text}` });
-      setText("");
       getMessages();
+      setText("");
     }
   }
 
@@ -73,44 +82,11 @@ export default function Chat() {
     <View style={styles.container}>
       <View style={styles.messagesView}>
         {data.length ? (
-          <FlatList
-            contentContainerStyle={styles.flatList}
-            data={data}
-            renderItem={({ item }) => {
-              const { date, user, text } = divideMessage(item);
-              if (user === stringRef) {
-                return (
-                  <View style={styles.viewText}>
-                    <Text
-                      textBreakStrategy="simple"
-                      style={[
-                        styles.text,
-                        { borderBottomLeftRadius: 20, left: "20%" },
-                      ]}
-                    >
-                      {text}
-                    </Text>
-                    <Text style={[styles.dateText, { left: "25%" }]}>
-                      {date}
-                    </Text>
-                  </View>
-                );
-              } else {
-                return (
-                  <View style={styles.viewText}>
-                    <Text
-                      style={[styles.text, { borderBottomRightRadius: 20 }]}
-                    >
-                      {text}
-                    </Text>
-                    <Text style={[styles.dateText, { left: 10 }]}>{date}</Text>
-                  </View>
-                );
-              }
-            }}
-          />
+          <AllMessages data={data} stringRef={stringRef} />
         ) : (
-          <Text>{lang.startDialog}</Text>
+          <View style={styles.spareView}>
+            <Text style={styles.text}>{lang.startDialog}</Text>
+          </View>
         )}
       </View>
       <View style={styles.bottom}>
@@ -136,9 +112,6 @@ const getStyles = (colors: ObjectColor, bodyHeight: number) =>
       height: "100%",
       backgroundColor: colors.background,
     },
-    flatList: {
-      gap: 10,
-    },
     messagesView: {
       height: bodyHeight * 0.93,
       backgroundColor: colors.chatBc,
@@ -163,21 +136,14 @@ const getStyles = (colors: ObjectColor, bodyHeight: number) =>
       color: colors.text,
       width: "90%",
     },
-    viewText: {
-      position: "relative",
-      width: "100%",
-    },
     text: {
       color: colors.text,
-      padding: 7,
-      paddingLeft: 10,
-      borderTopRightRadius: 20,
-      borderTopLeftRadius: 20,
-      backgroundColor: colors.headerBc,
-      width: "80%",
     },
-    dateText: {
-      color: colors.text,
-      position: "relative",
+    spareView: {
+      width: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+      position: 'absolute',
+      bottom: '50%'
     },
   });

@@ -28,7 +28,7 @@ export default function Index() {
     if (user) {
       setIsAuth(true);
       user.displayName &&
-        dispatch(authState.actions.setNick(user.displayName!));
+      dispatch(authState.actions.setNick(user.displayName!));
       dispatch(authState.actions.setEmail(user.email!));
       dispatch(authState.actions.setPhoto(user.photoURL!));
     } else setIsAuth(false);

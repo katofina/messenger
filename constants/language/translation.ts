@@ -35,6 +35,9 @@ export const translation = {
         change: "Change",
         changeLang: "Change Language",
         chooseLang: "Choose Language:",
+        copy: "Copy",
+        deleteForYouself: "Delete for youself",
+        deleteForBoth: "Delete for both",
     },
     ru: {
         welcome: 'Добро пожаловать в Messenger',
@@ -72,5 +75,8 @@ export const translation = {
         change: "Изменить",
         changeLang: "Изменить язык",
         chooseLang: "Выберите язык:",
+        copy: "Копировать",
+        deleteForYouself: "Удалить у себя",
+        deleteForBoth: "Удалить у обоих",
     },
 };
