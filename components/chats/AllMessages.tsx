@@ -55,7 +55,7 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         data={data}
         CellRendererComponent={({ children }) => children}
         renderItem={({ item, index }) => {
-          const { date, user, text } = divideMessage(item[1]);
+          const { stringWithoutGMT, user, text } = divideMessage(item[1]);
           if (user === stringRef) {
             return (
               <Pressable
@@ -73,7 +73,7 @@ export const AllMessages = ({ data, stringRef }: Props) => {
                 >
                   {text}
                 </Text>
-                <Text style={[styles.dateText, { left: "25%" }]}>{date}</Text>
+                <Text style={[styles.dateText, { left: "25%" }]}>{stringWithoutGMT}</Text>
               </Pressable>
             );
           } else {
@@ -87,7 +87,7 @@ export const AllMessages = ({ data, stringRef }: Props) => {
                 <Text style={[styles.text, { borderBottomRightRadius: 20 }]}>
                   {text}
                 </Text>
-                <Text style={[styles.dateText, { left: 10 }]}>{date}</Text>
+                <Text style={[styles.dateText, { left: 10 }]}>{stringWithoutGMT}</Text>
               </Pressable>
             );
           }
