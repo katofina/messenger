@@ -17,7 +17,7 @@ export default function ChatLayout() {
 
   useEffect(() => {
     database().ref(user.stringRef + "/chats/" + email).update({info: {nick: nick, email: email, photo: photo, online: online}});
-    database().ref(email + "/chats/" + user.stringRef).update({info: {nick: user.nick, email: user.email, photo: user.photoURL, online: online}})
+    database().ref(email + "/chats/" + user.stringRef).update({info: {nick: user.nick, email: user.stringRef, photo: user.photoURL, online: "true"}})
   }, []);
 
   return (

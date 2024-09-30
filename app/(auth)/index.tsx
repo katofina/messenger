@@ -7,7 +7,8 @@ import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import { Avatar } from "@/components/menu/Avatar";
 import divideMessage from "@/functions/firebase/divideMessage";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
+import useLanguage from "@/hooks/useLanguage";
 
 interface UserData {
   info: UserInfo;
@@ -50,6 +51,8 @@ export default function InitialAuth() {
     };
   }, []);
 
+  const lang = useLanguage();
+
   return (
     <View style={styles.container}>
       {nicks && data ? (
@@ -57,50 +60,58 @@ export default function InitialAuth() {
           data={nicks}
           renderItem={({ item }) => {
             const userData: UserData = data[item];
-            const info: UserInfo = userData.info;
-            const { text } = divideMessage(userData.messages.at(-1)!);
-            return (
-              <Link
-                href={{
-                  pathname: "/(chat)",
-                  params: {
-                    nick: info.nick,
-                    email: info.email,
-                    photo: info.photo,
-                    online: info.online,
-                  },
-                }}
-                asChild
-              >
-                <Pressable style={styles.chat}>
-                  <Avatar photo={info.photo} sizeImg={50} sizeView={50} />
-                  <View style={styles.textView}>
-                    {info.online === "true" ? (
-                      <Text style={[styles.status, { color: colors.online }]}>
-                        Online
-                      </Text>
-                    ) : (
-                      <Text style={[styles.status, { color: colors.offline }]}>
-                        Offline
-                      </Text>
-                    )}
-                    <Text style={styles.nick}>{info.nick}</Text>
-                    <Text
-                      ellipsizeMode="tail"
-                      numberOfLines={1}
-                      style={styles.message}
-                    >
-                      {text}
-                    </Text>
-                  </View>
-                </Pressable>
-              </Link>
-            );
+            if (userData) {
+              const info: UserInfo = userData.info;
+              let lastMessage = null;
+              if (userData.messages) {
+                const messages = Object.values(userData.messages);
+                lastMessage = divideMessage(messages.at(-1)!);
+              }
+              return (
+                <Link
+                  href={{
+                    pathname: "/(chat)",
+                    params: {
+                      nick: info.nick,
+                      email: info.email,
+                      photo: info.photo,
+                      online: info.online,
+                    },
+                  }}
+                  asChild
+                >
+                  <Pressable style={styles.chat}>
+                    <Avatar photo={info.photo} sizeImg={50} sizeView={50} />
+                    <View style={styles.textView}>
+                      {info.online === "true" ? (
+                        <Text style={[styles.status, { color: colors.online }]}>
+                          {lang.online}
+                        </Text>
+                      ) : (
+                        <Text
+                          style={[styles.status, { color: colors.offline }]}
+                        >
+                          {lang.offline}
+                        </Text>
+                      )}
+                      <Text style={styles.nick}>{info.nick}</Text>
+                      {lastMessage ? (
+                        <Text
+                          ellipsizeMode="tail"
+                          numberOfLines={1}
+                          style={styles.message}
+                        >
+                          {lastMessage.text}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </Pressable>
+                </Link>
+              );
+            } else return null;
           }}
         />
-      ) : (
-        <Text style={styles.text}>You don't have any chat yet.</Text>
-      )}
+      ) : null}
     </View>
   );
 }

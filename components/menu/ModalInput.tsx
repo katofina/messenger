@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { authState } from "@/redux/AuthSlice";
 import { Store } from "@/redux/Store";
 import { AntDesign } from "@expo/vector-icons";
+import useLanguage from "@/hooks/useLanguage";
 
 interface Props {
   isOpen: boolean;
@@ -73,13 +74,21 @@ export const ModalInput = ({ isOpen, close }: Props) => {
           setIsExistNick(false);
           database()
             .ref("nicknames/" + data.nickname)
-            .set({email: user.stringRef, nickname: data.nickname, photoURL: user.photoURL});
-          database().ref("nicknames/" + user.nick).remove();
+            .set({
+              email: user.stringRef,
+              nickname: data.nickname,
+              photoURL: user.photoURL,
+            });
+          database()
+            .ref("nicknames/" + user.nick)
+            .remove();
           dispatch(authState.actions.setNick(data.nickname));
         })
         .catch((error) => setError(error));
     } else setIsExistNick(true);
   }
+
+  const lang = useLanguage();
 
   return (
     <Animated.View
@@ -95,7 +104,7 @@ export const ModalInput = ({ isOpen, close }: Props) => {
             <AntDesign name="close" size={26} color={colors.icon} />
           </TouchableOpacity>
         </View>
-        <Text style={styles.title}>Enter a new nickname:</Text>
+        <Text style={styles.title}>{lang.newNick}</Text>
         <Controller
           control={control}
           rules={{
@@ -104,7 +113,7 @@ export const ModalInput = ({ isOpen, close }: Props) => {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
-              placeholder="Nickname"
+              placeholder={lang.nickname}
               onChange={onChange}
               value={value}
               onBlur={onBlur}
@@ -118,17 +127,15 @@ export const ModalInput = ({ isOpen, close }: Props) => {
             style={styles.button}
             onPress={handleSubmit(onSubmit)}
           >
-            <Text style={styles.textButton}>Change</Text>
+            <Text style={styles.textButton}>{lang.change}</Text>
           </TouchableOpacity>
         </View>
       </View>
       {errors.nickname && (
-        <Text style={styles.errorText}>
-          *Nickname should contain at least 6 characters.
-        </Text>
+        <Text style={styles.errorText}>{lang.errorNick}</Text>
       )}
       {isExistNick && (
-        <Text style={styles.errorText}>*This nick already exists.</Text>
+        <Text style={styles.errorText}>{lang.errorExistNick}</Text>
       )}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </Animated.View>

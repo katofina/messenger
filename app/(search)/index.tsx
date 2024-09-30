@@ -5,6 +5,7 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import getInfoByNick, { User } from "@/functions/firebase/getInfoByNick";
 import { Avatar } from "@/components/menu/Avatar";
+import useLanguage from "@/hooks/useLanguage";
 
 export default function Search() {
   const { colors } = useThemeColor();
@@ -24,6 +25,8 @@ export default function Search() {
   useEffect(() => {
     getUsers();
   }, [params.input]);
+
+  const lang = useLanguage();
 
   if (data.length) {
     return (
@@ -49,9 +52,9 @@ export default function Search() {
                 <View style={styles.textView}>
                   <Text style={styles.text}>{item.nickname}</Text>
                   {item.online ? (
-                    <Text style={styles.online}>Online</Text>
+                    <Text style={styles.online}>{lang.online}</Text>
                   ) : (
-                    <Text style={styles.offline}>Offline</Text>
+                    <Text style={styles.offline}>{lang.offline}</Text>
                   )}
                 </View>
               </Pressable>

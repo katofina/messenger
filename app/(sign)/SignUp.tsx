@@ -20,6 +20,7 @@ import getStringRef from "@/functions/firebase/getStringRef";
 import { useDispatch } from "react-redux";
 import { authState } from "@/redux/AuthSlice";
 import includesNick from "@/functions/firebase/includesNick";
+import useLanguage from "@/hooks/useLanguage";
 
 interface SignUpData {
   confirm_password: string;
@@ -50,7 +51,9 @@ export default function SignUp() {
           dispatch(authState.actions.setNick(data.nickname));
           router.replace("/");
           const stringRef = getStringRef(data.email);
-          database().ref("nicknames/" + data.nickname).set({ email: stringRef, nickname: data.nickname });
+          database()
+            .ref("nicknames/" + data.nickname)
+            .set({ email: stringRef, nickname: data.nickname });
           return result.user.updateProfile({
             displayName: data.nickname,
           });
@@ -62,10 +65,11 @@ export default function SignUp() {
 
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+  const lang = useLanguage();
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.text}>Create Account</Text>
+      <Text style={styles.text}>{lang.createAccount}</Text>
       <View style={styles.form}>
         <Controller
           control={control}
@@ -75,7 +79,7 @@ export default function SignUp() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
-              placeholder="Nickname"
+              placeholder={lang.nickname}
               onChange={onChange}
               value={value}
               onBlur={onBlur}
@@ -93,7 +97,7 @@ export default function SignUp() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <Input
-              placeholder="Email"
+              placeholder={lang.email}
               onChange={onChange}
               value={value}
               onBlur={onBlur}
@@ -111,7 +115,7 @@ export default function SignUp() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <PasswordInput
-              placeholder="Password"
+              placeholder={lang.password}
               onBlur={onBlur}
               onChange={(value) => onChange(value)}
               value={value}
@@ -128,7 +132,7 @@ export default function SignUp() {
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <PasswordInput
-              placeholder="Confirm password"
+              placeholder={lang.confirmPassword}
               onBlur={onBlur}
               onChange={(value) => onChange(value)}
               value={value}
@@ -142,36 +146,25 @@ export default function SignUp() {
           style={styles.button}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text style={styles.simpleText}>Create</Text>
+          <Text style={styles.simpleText}>{lang.create}</Text>
         </TouchableOpacity>
         <Link href="/(sign)/SignIn" style={styles.link}>
-          Do you have account?
+          {lang.doYouHaveAccount}
         </Link>
       </View>
-      {errors.email && (
-        <Text style={styles.errorText}>
-          *You need enter truly email. Email is required.
-        </Text>
-      )}
+      {errors.email && <Text style={styles.errorText}>{lang.errorEmail}</Text>}
       {errors.nickname && (
-        <Text style={styles.errorText}>
-          *Nickname should contain at least 6 characters.
-        </Text>
+        <Text style={styles.errorText}>{lang.errorNick}</Text>
       )}
       {errors.password && (
-        <Text style={styles.errorText}>
-          *Password must contains one digit, lowercase charachter and 7
-          characters at all.
-        </Text>
+        <Text style={styles.errorText}>{lang.errorPass}</Text>
       )}
       {errors.confirm_password && (
-        <Text style={styles.errorText}>*You need to confirm password.</Text>
+        <Text style={styles.errorText}>{lang.confirmPassword}</Text>
       )}
-      {isConfirmPass || (
-        <Text style={styles.errorText}>*Passwords are not matched.</Text>
-      )}
+      {isConfirmPass || <Text style={styles.errorText}>{lang.errorMatch}</Text>}
       {isExistNick && (
-        <Text style={styles.errorText}>*This nick already exists.</Text>
+        <Text style={styles.errorText}>{lang.errorExistNick}</Text>
       )}
       {error && <Text style={styles.errorText}>{error}</Text>}
     </SafeAreaView>
