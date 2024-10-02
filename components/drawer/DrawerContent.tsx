@@ -9,6 +9,7 @@ import { router } from "expo-router";
 import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import useLanguage from "@/hooks/useLanguage";
+import database from "@react-native-firebase/database";
 
 export function DrawerContent() {
   const { colors } = useThemeColor();
@@ -25,6 +26,9 @@ export function DrawerContent() {
     auth()
       .signOut()
       .then(() => router.replace("/InitialNotAuth"));
+    database()
+        .ref("nicknames/" + user.nick)
+        .update({ online: false });
   }
 
   return (

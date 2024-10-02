@@ -3,9 +3,9 @@ import useThemeColor from "@/hooks/useThemeColor";
 import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import getInfoByNick, { User } from "@/functions/firebase/getInfoByNick";
 import { Avatar } from "@/components/menu/Avatar";
 import useLanguage from "@/hooks/useLanguage";
+import searchByNick, { User } from "@/functions/firebase/searchByNick";
 
 export default function Search() {
   const { colors } = useThemeColor();
@@ -17,7 +17,7 @@ export default function Search() {
 
   const getUsers = async () => {
     if (params.input) {
-      const users = await getInfoByNick(params.input);
+      const users = await searchByNick(params.input);
       setData(users);
     }
   };

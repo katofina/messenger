@@ -7,7 +7,7 @@ export interface User {
   online?: string;
 };
 
-export default async function getInfoByNick(input: string) {
+export default async function searchByNick(input: string) {
   const users: Array<User> = [];
   await database()
     .ref("nicknames")
