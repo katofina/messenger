@@ -21,6 +21,7 @@ import { AllMessages } from "@/components/chats/AllMessages";
 export default function Chat() {
   const { email } = useLocalSearchParams();
   const stringRef = useSelector((store: Store) => store.authState.stringRef);
+  const isOpen = useSelector((store: Store) => store.chatMenuState.isOpenModule);
 
   const headerHeight = useHeaderHeight();
   const height = useWindowDimensions().height;
@@ -46,7 +47,7 @@ export default function Chat() {
           const values: string[][] = Object.entries(data);
           const messages = values.filter((item) => item[1] !== null);
           setData(messages);
-        }
+        } else setData([]);
       });
     database().ref(email + "/chats/" + stringRef + "/messages").on("value", (snapshot) => {
         const data = snapshot.val();
@@ -58,7 +59,7 @@ export default function Chat() {
   }
   useEffect(() => {
     getMessages();
-  }, []);
+  }, [isOpen]);
 
   function sendMessage() {
     const lastPosition = data.length ? Object.keys(data).at(-1) : '0';

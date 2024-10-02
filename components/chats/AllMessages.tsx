@@ -14,6 +14,10 @@ import { useRef, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import { Hint } from "../Hint";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useDispatch, useSelector } from "react-redux";
+import { Store } from "@/redux/Store";
+import { chatMenuState } from "@/redux/ChatMenuSlice";
+import { ConfirmModule } from "./ConfirmModule";
 
 interface Props {
   data: string[][];
@@ -47,6 +51,13 @@ export const AllMessages = ({ data, stringRef }: Props) => {
   }
   const [isHint, setIsHint] = useState(false);
   const closeHint = () => setIsHint(false);
+
+  const isOpenChatMenu = useSelector((store: Store) => store.chatMenuState);
+  const dispatch = useDispatch();
+  const closeMenuChat = () => {
+    dispatch(chatMenuState.actions.closeChatMenu());
+    dispatch(chatMenuState.actions.closeModule());
+  };
 
   return (
     <GestureHandlerRootView>
@@ -108,6 +119,8 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         isOpen={isHint}
         close={closeHint}
       />
+      {(isOpenChatMenu.isOpen || isOpenChatMenu.isOpenModule) && <Pressable style={styles.overlay} onPress={closeMenuChat} />}
+      <ConfirmModule/>
     </GestureHandlerRootView>
   );
 };
