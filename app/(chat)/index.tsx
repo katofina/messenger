@@ -21,7 +21,9 @@ import { AllMessages } from "@/components/chats/AllMessages";
 export default function Chat() {
   const { email } = useLocalSearchParams();
   const stringRef = useSelector((store: Store) => store.authState.stringRef);
-  const isOpen = useSelector((store: Store) => store.chatMenuState.isOpenModule);
+  const isOpen = useSelector(
+    (store: Store) => store.chatMenuState.isOpenModule,
+  );
 
   const headerHeight = useHeaderHeight();
   const height = useWindowDimensions().height;
@@ -35,7 +37,13 @@ export default function Chat() {
     setText(text);
   }
 
-  const lastSave = useRef('0');
+  database()
+    .ref(stringRef + "/chats/" + email)
+    .on("child_changed", () => {
+      getMessages();
+    });
+
+  const lastSave = useRef("0");
 
   const [data, setData] = useState<string[][]>([]);
   function getMessages() {
@@ -49,7 +57,9 @@ export default function Chat() {
           setData(messages);
         } else setData([]);
       });
-    database().ref(email + "/chats/" + stringRef + "/messages").on("value", (snapshot) => {
+    database()
+      .ref(email + "/chats/" + stringRef + "/messages")
+      .on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
           const values: string[] = Object.keys(data);
@@ -62,10 +72,12 @@ export default function Chat() {
   }, [isOpen]);
 
   function sendMessage() {
-    const lastPosition = data.length ? Object.keys(data).at(-1) : '0';
+    const lastPosition = data.length ? Object.keys(data).at(-1) : "0";
     if (text.length) {
       const date = new Date().toString();
-      const position = lastSave.current > lastPosition! ? Number(lastSave.current) + 1 : Number(lastPosition!) + 1;
+      let position;
+      if (lastSave.current > lastPosition!) position = +lastSave.current + 1;
+      else position = +lastPosition! + 1;
       database()
         .ref(stringRef + "/chats/" + email + "/messages")
         .update({ [position]: `${date}/${stringRef}:${text}` });
@@ -144,7 +156,7 @@ const getStyles = (colors: ObjectColor, bodyHeight: number) =>
       width: "100%",
       alignItems: "center",
       justifyContent: "center",
-      position: 'absolute',
-      bottom: '50%'
+      position: "absolute",
+      bottom: "50%",
     },
   });

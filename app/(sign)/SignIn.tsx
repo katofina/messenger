@@ -15,7 +15,6 @@ import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
 import { useState } from "react";
 import useLanguage from "@/hooks/useLanguage";
-
 interface SignInData {
   email: string;
   password: string;

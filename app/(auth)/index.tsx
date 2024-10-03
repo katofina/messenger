@@ -25,7 +25,7 @@ interface UserInfo {
 
 interface Messages {
   [x: string]: string | null;
-} //nickname: {messages}
+}
 
 export default function InitialAuth() {
   const { colors } = useThemeColor();
@@ -35,11 +35,9 @@ export default function InitialAuth() {
   const [messages, setMessages] = useState<Messages[]>([]);
   const nick = useSelector((store: Store) => store.authState.nick);
   const [userInfo, setUserInfo] = useState<User[]>([]); //indexes like nicks
+  const [data, setData] = useState();
 
   useEffect(() => {
-    database()
-      .ref("nicknames/" + nick)
-      .update({ online: true });
     database()
       .ref(nick + "/chats")
       .on("value", (snapshot) => {
