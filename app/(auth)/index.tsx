@@ -6,9 +6,10 @@ import database from "@react-native-firebase/database";
 import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import { Avatar } from "@/components/menu/Avatar";
-import divideMessage from "@/functions/firebase/divideMessage";
 import { Link } from "expo-router";
 import useLanguage from "@/hooks/useLanguage";
+import { User } from "@/functions/firebase/searchByNick";
+import divideMessage from "@/functions/firebase/divideMessage";
 
 interface UserData {
   info: UserInfo;
@@ -18,97 +19,122 @@ interface UserData {
 interface UserInfo {
   email: string;
   nick: string;
+  photoURL: string;
   online: string;
-  photo: string;
+}
+
+interface Messages {
+  [x: string]: string | null;
 }
 
 export default function InitialAuth() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
 
-  const [nicks, setNicks] = useState<string[] | null>(null);
-  const [data, setData] = useState(null);
+  const [nicks, setNicks] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Messages[]>([]);
   const nick = useSelector((store: Store) => store.authState.nick);
+  const [userInfo, setUserInfo] = useState<User[]>([]); //indexes like nicks
+  const [data, setData] = useState();
 
   useEffect(() => {
-    database()
-      .ref("nicknames/" + nick)
-      .update({ online: true });
     database()
       .ref(nick + "/chats")
       .on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          const keys = Object.keys(data);
-          setNicks(keys);
-          setData(data);
+          const values: UserData[] = Object.values(data);
+          const messagesFromValues = values
+            .map((item) => {
+              const nickname = item.info.nick;
+              if (item.messages) {
+                const lastMessage = Object.values(item.messages).at(-1);
+                return { [nickname]: lastMessage! };
+              } else return {[nickname]: null};
+            });
+          const nicksFromValues = values.map((item) => item.info.nick);
+          setNicks(nicksFromValues);
+          setMessages(messagesFromValues);
         }
       });
-    return () => {
-      database()
-        .ref("nicknames/" + nick)
-        .update({ online: false });
-    };
   }, []);
+
+  async function createArrayInfo() {
+    if (nicks.length) {
+      const arrayUserInfo: User[] = [];
+      for (let nick of nicks) {
+        await database()
+          .ref("nicknames")
+          .once("value")
+          .then((snapshot) => {
+            const data = snapshot.val();
+            arrayUserInfo.push(data[nick]);
+          });
+      };
+      setUserInfo(arrayUserInfo);
+    };
+  };
+
+  useEffect(() => {
+    createArrayInfo();
+  }, [nicks]);
 
   const lang = useLanguage();
 
   return (
     <View style={styles.container}>
-      {nicks && data ? (
+      {(nicks.length && userInfo.length) ?  (
         <FlatList
           data={nicks}
-          renderItem={({ item }) => {
-            const userData: UserData = data[item];
-            if (userData) {
-              const info: UserInfo = userData.info;
-              let lastMessage = null;
-              if (userData.messages) {
-                const messages = Object.values(userData.messages);
-                lastMessage = divideMessage(messages.at(-1)!);
-              }
-              return (
-                <Link
-                  href={{
-                    pathname: "/(chat)",
-                    params: {
-                      nick: info.nick,
-                      email: info.email,
-                      photo: info.photo,
-                      online: info.online,
-                    },
-                  }}
-                  asChild
-                >
-                  <Pressable style={styles.chat}>
-                    <Avatar photo={info.photo} sizeImg={50} sizeView={50} />
-                    <View style={styles.textView}>
-                      {info.online === "true" ? (
-                        <Text style={[styles.status, { color: colors.online }]}>
-                          {lang.online}
-                        </Text>
-                      ) : (
-                        <Text
-                          style={[styles.status, { color: colors.offline }]}
-                        >
-                          {lang.offline}
-                        </Text>
-                      )}
-                      <Text style={styles.nick}>{info.nick}</Text>
-                      {lastMessage ? (
-                        <Text
-                          ellipsizeMode="tail"
-                          numberOfLines={1}
-                          style={styles.message}
-                        >
-                          {lastMessage.text}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </Pressable>
-                </Link>
-              );
-            } else return null;
+          renderItem={({ item, index }) => {
+            const infoOfUser = userInfo[index];
+            const lastMessage = messages[index][infoOfUser.nickname];
+            const dividedMessage = lastMessage && divideMessage(lastMessage);
+            return (
+              <Link
+                href={{
+                  pathname: "/(chat)",
+                  params: {
+                    nick: infoOfUser.nickname,
+                    email: infoOfUser.email,
+                    photo: infoOfUser.photoURL,
+                    online: infoOfUser.online,
+                  },
+                }}
+                asChild
+              >
+                <Pressable style={styles.chat}>
+                  <Avatar
+                    photo={infoOfUser.photoURL}
+                    sizeImg={50}
+                    sizeView={50}
+                  />
+                  <View style={styles.textView}>
+                    {infoOfUser.online === "true" ? (
+                      <Text style={[styles.status, { color: colors.online }]}>
+                        {lang.online}
+                      </Text>
+                    ) : (
+                      <Text style={[styles.status, { color: colors.offline }]}>
+                        {lang.offline}
+                      </Text>
+                    )}
+                    <Text style={styles.nick}>
+                      {infoOfUser.nickname}
+                    </Text>
+                    {dividedMessage ? (
+                      <Text
+                        ellipsizeMode="tail"
+                        numberOfLines={1}
+                        style={styles.message}
+                      >
+                        {dividedMessage.text}
+                      </Text>
+                    ) : null}
+                  </View>
+                </Pressable>
+              </Link>
+            );
           }}
         />
       ) : null}
