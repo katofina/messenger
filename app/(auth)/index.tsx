@@ -20,7 +20,7 @@ interface UserInfo {
   email: string;
   nick: string;
   photoURL: string;
-  online: string;
+  online: boolean;
 }
 
 interface Messages {
@@ -35,7 +35,6 @@ export default function InitialAuth() {
   const [messages, setMessages] = useState<Messages[]>([]);
   const nick = useSelector((store: Store) => store.authState.nick);
   const [userInfo, setUserInfo] = useState<User[]>([]); //indexes like nicks
-  const [data, setData] = useState();
 
   useEffect(() => {
     database()
@@ -44,14 +43,13 @@ export default function InitialAuth() {
         const data = snapshot.val();
         if (data) {
           const values: UserData[] = Object.values(data);
-          const messagesFromValues = values
-            .map((item) => {
-              const nickname = item.info.nick;
-              if (item.messages) {
-                const lastMessage = Object.values(item.messages).at(-1);
-                return { [nickname]: lastMessage! };
-              } else return {[nickname]: null};
-            });
+          const messagesFromValues = values.map((item) => {
+            const nickname = item.info.nick;
+            if (item.messages) {
+              const lastMessage = Object.values(item.messages).at(-1);
+              return { [nickname]: lastMessage! };
+            } else return { [nickname]: null };
+          });
           const nicksFromValues = values.map((item) => item.info.nick);
           setNicks(nicksFromValues);
           setMessages(messagesFromValues);
@@ -59,21 +57,20 @@ export default function InitialAuth() {
       });
   }, []);
 
-  async function createArrayInfo() {
+  function createArrayInfo() {
     if (nicks.length) {
-      const arrayUserInfo: User[] = [];
-      for (let nick of nicks) {
-        await database()
-          .ref("nicknames")
-          .once("value")
-          .then((snapshot) => {
-            const data = snapshot.val();
+      database()
+        .ref("nicknames")
+        .on("value", (snapshot) => {
+          const data = snapshot.val();
+          const arrayUserInfo: User[] = [];
+          for (let nick of nicks) {
             arrayUserInfo.push(data[nick]);
-          });
-      };
-      setUserInfo(arrayUserInfo);
-    };
-  };
+          }
+          setUserInfo(arrayUserInfo);
+        });
+    }
+  }
 
   useEffect(() => {
     createArrayInfo();
@@ -83,7 +80,7 @@ export default function InitialAuth() {
 
   return (
     <View style={styles.container}>
-      {(nicks.length && userInfo.length) ?  (
+      {nicks.length && userInfo.length ? (
         <FlatList
           data={nicks}
           renderItem={({ item, index }) => {
@@ -110,7 +107,7 @@ export default function InitialAuth() {
                     sizeView={50}
                   />
                   <View style={styles.textView}>
-                    {infoOfUser.online === "true" ? (
+                    {infoOfUser.online ? (
                       <Text style={[styles.status, { color: colors.online }]}>
                         {lang.online}
                       </Text>
@@ -119,9 +116,7 @@ export default function InitialAuth() {
                         {lang.offline}
                       </Text>
                     )}
-                    <Text style={styles.nick}>
-                      {infoOfUser.nickname}
-                    </Text>
+                    <Text style={styles.nick}>{infoOfUser.nickname}</Text>
                     {dividedMessage ? (
                       <Text
                         ellipsizeMode="tail"

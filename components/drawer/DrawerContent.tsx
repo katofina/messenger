@@ -25,10 +25,10 @@ export function DrawerContent() {
   function logOut() {
     auth()
       .signOut()
-      .then(() => router.replace("/InitialNotAuth"));
-    database()
+      .then(() => {    database()
         .ref("nicknames/" + user.nick)
         .update({ online: false });
+        router.replace("/InitialNotAuth")});
   }
 
   return (

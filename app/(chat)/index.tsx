@@ -37,12 +37,6 @@ export default function Chat() {
     setText(text);
   }
 
-  database()
-    .ref(stringRef + "/chats/" + email)
-    .on("child_changed", () => {
-      getMessages();
-    });
-
   const lastSave = useRef("0");
 
   const [data, setData] = useState<string[][]>([]);
