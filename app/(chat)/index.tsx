@@ -17,13 +17,11 @@ import { useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import useLanguage from "@/hooks/useLanguage";
 import { AllMessages } from "@/components/chats/AllMessages";
+import {Keyboard} from 'react-native'
 
 export default function Chat() {
   const { email } = useLocalSearchParams();
   const stringRef = useSelector((store: Store) => store.authState.stringRef);
-  const isOpen = useSelector(
-    (store: Store) => store.chatMenuState.isOpenModule,
-  );
 
   const headerHeight = useHeaderHeight();
   const height = useWindowDimensions().height;
@@ -37,12 +35,6 @@ export default function Chat() {
     setText(text);
   }
 
-  database()
-    .ref(stringRef + "/chats/" + email)
-    .on("child_changed", () => {
-      getMessages();
-    });
-
   const lastSave = useRef("0");
 
   const [data, setData] = useState<string[][]>([]);
@@ -53,7 +45,7 @@ export default function Chat() {
         const data = snapshot.val();
         if (data) {
           const values: string[][] = Object.entries(data);
-          const messages = values.filter((item) => item[1] !== null);
+          const messages = values.filter((item) => item[1] !== null).reverse();
           setData(messages);
         } else setData([]);
       });
@@ -62,17 +54,14 @@ export default function Chat() {
       .on("value", (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          const values: string[] = Object.keys(data);
-          lastSave.current = values.at(-1)!;
+          const keys: string[] = Object.keys(data);
+          lastSave.current = keys.at(-1)!;
         }
       });
   }
-  useEffect(() => {
-    getMessages();
-  }, [isOpen]);
 
   function sendMessage() {
-    const lastPosition = data.length ? Object.keys(data).at(-1) : "0";
+    const lastPosition = data.length ? data[0][0] : "0";
     if (text.length) {
       const date = new Date().toString();
       let position;
@@ -84,10 +73,14 @@ export default function Chat() {
       database()
         .ref(email + "/chats/" + stringRef + "/messages")
         .update({ [position]: `${date}/${stringRef}:${text}` });
-      getMessages();
       setText("");
+      Keyboard.dismiss();
     }
   }
+
+  useEffect(() => {
+    getMessages();
+  }, []);
 
   const lang = useLanguage();
 
@@ -126,7 +119,7 @@ const getStyles = (colors: ObjectColor, bodyHeight: number) =>
       backgroundColor: colors.background,
     },
     messagesView: {
-      height: bodyHeight * 0.93,
+      height: '93%',
       backgroundColor: colors.chatBc,
       padding: 10,
     },

@@ -35,7 +35,6 @@ export default function InitialAuth() {
   const [messages, setMessages] = useState<Messages[]>([]);
   const nick = useSelector((store: Store) => store.authState.nick);
   const [userInfo, setUserInfo] = useState<User[]>([]); //indexes like nicks
-  const [data, setData] = useState();
 
   useEffect(() => {
     database()
@@ -44,14 +43,13 @@ export default function InitialAuth() {
         const data = snapshot.val();
         if (data) {
           const values: UserData[] = Object.values(data);
-          const messagesFromValues = values
-            .map((item) => {
-              const nickname = item.info.nick;
-              if (item.messages) {
-                const lastMessage = Object.values(item.messages).at(-1);
-                return { [nickname]: lastMessage! };
-              } else return {[nickname]: null};
-            });
+          const messagesFromValues = values.map((item) => {
+            const nickname = item.info.nick;
+            if (item.messages) {
+              const lastMessage = Object.values(item.messages).at(-1);
+              return { [nickname]: lastMessage! };
+            } else return { [nickname]: null };
+          });
           const nicksFromValues = values.map((item) => item.info.nick);
           setNicks(nicksFromValues);
           setMessages(messagesFromValues);
@@ -63,17 +61,17 @@ export default function InitialAuth() {
     if (nicks.length) {
       const arrayUserInfo: User[] = [];
       for (let nick of nicks) {
-        await database()
+        nick && await database()
           .ref("nicknames")
           .once("value")
           .then((snapshot) => {
             const data = snapshot.val();
             arrayUserInfo.push(data[nick]);
           });
-      };
+      }
       setUserInfo(arrayUserInfo);
-    };
-  };
+    }
+  }
 
   useEffect(() => {
     createArrayInfo();
@@ -83,58 +81,58 @@ export default function InitialAuth() {
 
   return (
     <View style={styles.container}>
-      {(nicks.length && userInfo.length) ?  (
+      {nicks.length && userInfo.length ? (
         <FlatList
           data={nicks}
           renderItem={({ item, index }) => {
             const infoOfUser = userInfo[index];
-            const lastMessage = messages[index][infoOfUser.nickname];
-            const dividedMessage = lastMessage && divideMessage(lastMessage);
-            return (
-              <Link
-                href={{
-                  pathname: "/(chat)",
-                  params: {
-                    nick: infoOfUser.nickname,
-                    email: infoOfUser.email,
-                    photo: infoOfUser.photoURL,
-                    online: infoOfUser.online,
-                  },
-                }}
-                asChild
-              >
-                <Pressable style={styles.chat}>
-                  <Avatar
-                    photo={infoOfUser.photoURL}
-                    sizeImg={50}
-                    sizeView={50}
-                  />
-                  <View style={styles.textView}>
-                    {infoOfUser.online === "true" ? (
-                      <Text style={[styles.status, { color: colors.online }]}>
-                        {lang.online}
-                      </Text>
-                    ) : (
-                      <Text style={[styles.status, { color: colors.offline }]}>
-                        {lang.offline}
-                      </Text>
-                    )}
-                    <Text style={styles.nick}>
-                      {infoOfUser.nickname}
-                    </Text>
-                    {dividedMessage ? (
-                      <Text
-                        ellipsizeMode="tail"
-                        numberOfLines={1}
-                        style={styles.message}
-                      >
-                        {dividedMessage.text}
-                      </Text>
-                    ) : null}
-                  </View>
-                </Pressable>
-              </Link>
-            );
+            if (infoOfUser) {
+              const lastMessage = messages[index][infoOfUser.nickname];
+              const dividedMessage = lastMessage && divideMessage(lastMessage);
+              return (
+                <Link
+                  href={{
+                    pathname: "/(chat)",
+                    params: {
+                      nick: infoOfUser.nickname,
+                      email: infoOfUser.email,
+                      photo: infoOfUser.photoURL,
+                      online: String(infoOfUser.online),
+                    },
+                  }}
+                  asChild
+                >
+                  <Pressable style={styles.chat}>
+                    <Avatar
+                      photo={infoOfUser.photoURL}
+                      sizeImg={50}
+                      sizeView={50}
+                    />
+                    <View style={styles.textView}>
+                      {infoOfUser.online ? (
+                        <Text style={[styles.status, { color: colors.online }]}>
+                          {lang.online}
+                        </Text>
+                      ) : (
+                        <Text style={[styles.status, { color: colors.offline }]}>
+                          {lang.offline}
+                        </Text>
+                      )}
+                      <Text style={styles.nick}>{infoOfUser.nickname}</Text>
+                      {dividedMessage ? (
+                        <Text
+                          ellipsizeMode="tail"
+                          numberOfLines={1}
+                          style={styles.message}
+                        >
+                          {dividedMessage.text}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </Pressable>
+                </Link>
+              );
+            } else return null;
           }}
         />
       ) : null}

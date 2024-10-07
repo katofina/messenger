@@ -1,45 +1,25 @@
 import { Avatar } from "@/components/menu/Avatar";
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
-import { Store } from "@/redux/Store";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
 import { View, StyleSheet, Text, Pressable } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import database from "@react-native-firebase/database";
+import { useDispatch } from "react-redux";
 import { Entypo } from "@expo/vector-icons";
 import { chatMenuState } from "@/redux/ChatMenuSlice";
 import ChatMenu from "@/components/chats/ChatMenu";
+import useLanguage from "@/hooks/useLanguage";
 
 export default function ChatLayout() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+  const lang = useLanguage();
 
-  const user = useSelector((store: Store) => store.authState);
-  const { nick, email, photo, online } = useLocalSearchParams<{
+  const { nick, photo, online } = useLocalSearchParams<{
     nick: string;
     email: string;
     photo: string;
     online: string;
-  }>();
-
-  useEffect(() => {
-    database()
-      .ref(user.stringRef + "/chats/" + email)
-      .update({
-        info: { nick: nick, email: email, photo: photo, online: online },
-      });
-    database()
-      .ref(email + "/chats/" + user.stringRef)
-      .update({
-        info: {
-          nick: user.nick,
-          email: user.stringRef,
-          photo: user.photoURL,
-          online: "true",
-        },
-      });
-  }, []);
+  }>()
 
   const dispatch = useDispatch();
   function openMenu() {
@@ -61,9 +41,9 @@ export default function ChatLayout() {
                 <View style={styles.textView}>
                   <Text style={styles.nick}>{nick}</Text>
                   {online === "true" ? (
-                    <Text style={styles.online}>Online</Text>
+                    <Text style={styles.online}>{lang.online}</Text>
                   ) : (
-                    <Text style={styles.offline}>Offline</Text>
+                    <Text style={styles.offline}>{lang.offline}</Text>
                   )}
                 </View>
               </View>

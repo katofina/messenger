@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { MessageMenu } from "./MessageMenu";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Clipboard from "expo-clipboard";
 import { Hint } from "../Hint";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -44,7 +44,7 @@ export const AllMessages = ({ data, stringRef }: Props) => {
 
   async function copy() {
     const message = data.find((item) => item[0] === position.current)!;
-    const {text} = divideMessage(message[1]);
+    const { text } = divideMessage(message[1]);
     await Clipboard.setStringAsync(text);
     setIsHint(true);
     closeMenu();
@@ -59,12 +59,21 @@ export const AllMessages = ({ data, stringRef }: Props) => {
     dispatch(chatMenuState.actions.closeModule());
   };
 
+  const refFlat = useRef<FlatList<string[]>>(null);
+  function scrollEnd() {
+    refFlat.current && refFlat.current.scrollToEnd({ animated: true });
+  }
+  useEffect(() => {
+    scrollEnd;
+  }, [data]);
+
   return (
     <GestureHandlerRootView>
       <FlatList
         contentContainerStyle={styles.flatList}
+        ref={refFlat}
         data={data}
-        CellRendererComponent={({ children }) => children}
+        inverted={true}
         renderItem={({ item, index }) => {
           const { stringWithoutGMT, user, text } = divideMessage(item[1]);
           if (user === stringRef) {
@@ -84,7 +93,9 @@ export const AllMessages = ({ data, stringRef }: Props) => {
                 >
                   {text}
                 </Text>
-                <Text style={[styles.dateText, { left: "25%" }]}>{stringWithoutGMT}</Text>
+                <Text style={[styles.dateText, { left: "25%" }]}>
+                  {stringWithoutGMT}
+                </Text>
               </Pressable>
             );
           } else {
@@ -98,7 +109,9 @@ export const AllMessages = ({ data, stringRef }: Props) => {
                 <Text style={[styles.text, { borderBottomRightRadius: 20 }]}>
                   {text}
                 </Text>
-                <Text style={[styles.dateText, { left: 10 }]}>{stringWithoutGMT}</Text>
+                <Text style={[styles.dateText, { left: 10 }]}>
+                  {stringWithoutGMT}
+                </Text>
               </Pressable>
             );
           }
@@ -119,8 +132,10 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         isOpen={isHint}
         close={closeHint}
       />
-      {(isOpenChatMenu.isOpen || isOpenChatMenu.isOpenModule) && <Pressable style={styles.overlay} onPress={closeMenuChat} />}
-      <ConfirmModule/>
+      {(isOpenChatMenu.isOpen || isOpenChatMenu.isOpenModule) && (
+        <Pressable style={styles.overlay} onPress={closeMenuChat} />
+      )}
+      <ConfirmModule />
     </GestureHandlerRootView>
   );
 };
