@@ -20,7 +20,7 @@ interface UserInfo {
   email: string;
   nick: string;
   photoURL: string;
-  online: string;
+  online: boolean;
 }
 
 interface Messages {
@@ -50,6 +50,13 @@ export default function InitialAuth() {
               return { [nickname]: lastMessage! };
             } else return { [nickname]: null };
           });
+          const messagesFromValues = values.map((item) => {
+            const nickname = item.info.nick;
+            if (item.messages) {
+              const lastMessage = Object.values(item.messages).at(-1);
+              return { [nickname]: lastMessage! };
+            } else return { [nickname]: null };
+          });
           const nicksFromValues = values.map((item) => item.info.nick);
           setNicks(nicksFromValues);
           setMessages(messagesFromValues);
@@ -57,7 +64,7 @@ export default function InitialAuth() {
       });
   }, []);
 
-  async function createArrayInfo() {
+  function createArrayInfo() {
     if (nicks.length) {
       const arrayUserInfo: User[] = [];
       for (let nick of nicks) {
@@ -81,6 +88,7 @@ export default function InitialAuth() {
 
   return (
     <View style={styles.container}>
+      {nicks.length && userInfo.length ? (
       {nicks.length && userInfo.length ? (
         <FlatList
           data={nicks}
