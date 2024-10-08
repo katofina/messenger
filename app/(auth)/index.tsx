@@ -10,6 +10,7 @@ import { Link } from "expo-router";
 import useLanguage from "@/hooks/useLanguage";
 import { User } from "@/functions/firebase/searchByNick";
 import divideMessage from "@/functions/firebase/divideMessage";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface UserData {
   info: UserInfo;
@@ -50,13 +51,6 @@ export default function InitialAuth() {
               return { [nickname]: lastMessage! };
             } else return { [nickname]: null };
           });
-          const messagesFromValues = values.map((item) => {
-            const nickname = item.info.nick;
-            if (item.messages) {
-              const lastMessage = Object.values(item.messages).at(-1);
-              return { [nickname]: lastMessage! };
-            } else return { [nickname]: null };
-          });
           const nicksFromValues = values.map((item) => item.info.nick);
           setNicks(nicksFromValues);
           setMessages(messagesFromValues);
@@ -64,7 +58,7 @@ export default function InitialAuth() {
       });
   }, []);
 
-  function createArrayInfo() {
+  async function createArrayInfo() {
     if (nicks.length) {
       const arrayUserInfo: User[] = [];
       for (let nick of nicks) {
@@ -89,7 +83,6 @@ export default function InitialAuth() {
   return (
     <View style={styles.container}>
       {nicks.length && userInfo.length ? (
-      {nicks.length && userInfo.length ? (
         <FlatList
           data={nicks}
           renderItem={({ item, index }) => {
@@ -97,6 +90,7 @@ export default function InitialAuth() {
             if (infoOfUser) {
               const lastMessage = messages[index][infoOfUser.nickname];
               const dividedMessage = lastMessage && divideMessage(lastMessage);
+              const isImage = dividedMessage && dividedMessage!.text.includes("imageURL:");
               return (
                 <Link
                   href={{
@@ -133,7 +127,7 @@ export default function InitialAuth() {
                           numberOfLines={1}
                           style={styles.message}
                         >
-                          {dividedMessage.text}
+                          {isImage ? "image" : dividedMessage.text}
                         </Text>
                       ) : null}
                     </View>

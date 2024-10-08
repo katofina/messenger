@@ -7,13 +7,11 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import uploadPhoto from "@/functions/firebase/uploadPhoto";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import { useState } from "react";
 import { ModalInput } from "@/components/menu/ModalInput";
-import { ModalTheme } from "@/components/menu/ModalTheme";
+import { ModalPicker } from "@/components/menu/ModalPicker";
 import { themeState } from "@/redux/ThemeSlice";
 import { Hint } from "@/components/Hint";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -23,6 +21,9 @@ import useLanguage from "@/hooks/useLanguage";
 import { langState } from "@/redux/LanguageSlice";
 import { LanguageString } from "@/constants/language/types";
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Overlay } from "@/components/overlay/Overlay";
+import { ImageSourceModal, PromiseObject } from "@/components/images/ImageSourceModal";
+import auth from "@react-native-firebase/auth";
 
 export default function Settings() {
   const { colors } = useThemeColor();
@@ -35,50 +36,6 @@ export default function Settings() {
   const theme = useSelector((store: Store) => store.themeState.theme);
   const [isThemeModal, setIsThemeModal] = useState(false);
   const dispatch = useDispatch();
-
-  const uploadAndShow = async (uri: string) => {
-    const isUpload = await uploadPhoto(uri, user.stringRef);
-    if (isUpload.isSuccess) {
-      setHint({
-        color: colors.success,
-        text: "Photo is successfully uploaded.",
-        isOpen: true,
-      });
-      dispatch(authState.actions.setPhoto(isUpload.url!));
-      database()
-            .ref("nicknames/" + user.nick)
-            .update({photoURL: isUpload.url});
-    } else {
-      setHint({
-        color: colors.error,
-        text: isUpload.error!,
-        isOpen: true,
-      });
-    }
-  };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      uploadAndShow(result.assets[0].uri);
-    }
-  };
-
-  const pickPhoto = async () => {
-    let result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      quality: 1,
-    });
-    if (!result.canceled) {
-      uploadAndShow(result.assets[0].uri);
-    }
-  };
 
   const openInput = () => {
     setIsInputModal(true);
@@ -121,6 +78,44 @@ export default function Settings() {
     AsyncStorage.setItem('lang', item);
   };
 
+  function onCloseOverlay() {
+    setIsLangModal(false);
+    setIsThemeModal(false);
+    setIsInputModal(false);
+    closeSourceModal();
+  };
+
+  const [isOpenSourceModal, setIsOpenSourceModal] = useState(false);
+  function openSourceModal() {
+    setIsOpenSourceModal(true);
+  }
+  function closeSourceModal() {
+    setIsOpenSourceModal(false);
+  }
+  const uploadAndShow = async (loadObject: PromiseObject) => {
+    closeSourceModal();
+    await auth().currentUser?.updateProfile({
+      photoURL: loadObject.url,
+    });
+    if (loadObject.isSuccess) {
+      setHint({
+        color: colors.success,
+        text: "Photo is successfully uploaded.",
+        isOpen: true,
+      });
+      dispatch(authState.actions.setPhoto(loadObject.url!));
+      database()
+        .ref("nicknames/" + user.nick)
+        .update({photoURL: loadObject.url});
+    } else {
+      setHint({
+        color: colors.error,
+        text: loadObject.error!,
+        isOpen: true,
+      });
+    }
+  };
+
   return (
     <GestureHandlerRootView>
       <View style={styles.container}>
@@ -130,13 +125,9 @@ export default function Settings() {
           isOpen={hint.isOpen}
           close={closeHint}
         />
-        <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <TouchableOpacity style={styles.button} onPress={openSourceModal}>
           <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
-          <Text style={styles.text}>{lang.setPhotoGalery}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={pickPhoto}>
-          <MaterialIcons name="add-a-photo" size={24} color={colors.icon} />
-          <Text style={styles.text}>{lang.setPhotoCamera}</Text>
+          <Text style={styles.text}>{lang.uploadProfilePhoto}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={openInput}>
           <Feather name="edit-3" size={24} color={colors.icon} />
@@ -155,22 +146,22 @@ export default function Settings() {
           <Text style={styles.text}>{lang.changeLang}</Text>
         </TouchableOpacity>
         <ModalInput isOpen={isInputModal} close={changeName} />
-        <ModalTheme
+        <ModalPicker
           isOpen={isThemeModal}
-          close={() => setIsThemeModal(false)}
           data={["system", "dark", "light"]}
           title={lang.chooseTheme}
           active={theme}
           onChange={onChangeTheme}
         />
-        <ModalTheme
+        <ModalPicker
           isOpen={isLangModal}
-          close={() => setIsLangModal(false)}
           data={["english", "russian"]}
           title={lang.chooseLang}
           active={currLang}
           onChange={onChangeLang}
         />
+        {(isThemeModal || isLangModal || isInputModal || isOpenSourceModal) && <Overlay close={onCloseOverlay}/>}
+        <ImageSourceModal isOpen={isOpenSourceModal} closeModal={closeSourceModal} onLoad={uploadAndShow}/>
       </View>
     </GestureHandlerRootView>
   );

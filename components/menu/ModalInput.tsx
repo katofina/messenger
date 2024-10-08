@@ -100,11 +100,8 @@ export const ModalInput = ({ isOpen, close }: Props) => {
     >
       <View style={styles.container}>
         <View style={styles.titleView}>
-          <TouchableOpacity style={styles.close} onPress={() => close(false)}>
-            <AntDesign name="close" size={26} color={colors.icon} />
-          </TouchableOpacity>
-        </View>
         <Text style={styles.title}>{lang.newNick}</Text>
+        </View>
         <Controller
           control={control}
           rules={{
@@ -169,14 +166,6 @@ const getStyles = (colors: ObjectColor) =>
     title: {
       color: colors.text,
       fontSize: 20,
-    },
-    close: {
-      position: "absolute",
-      top: 10,
-      right: 10,
-      height: 30,
-      width: 30,
-      alignItems: "center",
     },
     viewButton: {
       width: "100%",

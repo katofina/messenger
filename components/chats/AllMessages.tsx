@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Pressable,
   GestureResponderEvent,
-  useWindowDimensions,
+  Image,
 } from "react-native";
 import { MessageMenu } from "./MessageMenu";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import { chatMenuState } from "@/redux/ChatMenuSlice";
 import { ConfirmModule } from "./ConfirmModule";
+import { Overlay } from "../overlay/Overlay";
 
 interface Props {
   data: string[][];
@@ -26,8 +27,7 @@ interface Props {
 
 export const AllMessages = ({ data, stringRef }: Props) => {
   const { colors } = useThemeColor();
-  const { height, width } = useWindowDimensions();
-  const styles = getStyles(colors, height, width);
+  const styles = getStyles(colors);
 
   const [isOpen, setIsOpen] = useState(false);
   const layoutY = useRef(0);
@@ -76,45 +76,46 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         inverted={true}
         renderItem={({ item, index }) => {
           const { stringWithoutGMT, user, text } = divideMessage(item[1]);
-          if (user === stringRef) {
-            return (
-              <Pressable
-                style={[styles.viewText, { zIndex: -index }]}
-                onPress={(event: GestureResponderEvent) =>
-                  openMenu(event, item[0])
-                }
-              >
+          const isImage = text.includes("imageURL:");
+          const isOwnMess = user === stringRef;
+          return (
+            <Pressable
+              style={[styles.viewText, { zIndex: -index }]}
+              onPress={(event: GestureResponderEvent) =>
+                openMenu(event, item[0])
+              }
+            >
+              {isImage ? (
+                <Image
+                  source={{ uri: text.slice(9) }}
+                  style={[
+                    styles.image,
+                    {
+                      left: isOwnMess ? "20%" : 0,
+                      borderBottomRightRadius: isOwnMess ? 0 : 20,
+                      borderBottomLeftRadius: isOwnMess ? 20 : 0,
+                    },
+                  ]}
+                />
+              ) : (
                 <Text
-                  textBreakStrategy="simple"
                   style={[
                     styles.text,
-                    { borderBottomLeftRadius: 20, left: "20%" },
+                    {
+                      borderBottomRightRadius: isOwnMess ? 0 : 20,
+                      borderBottomLeftRadius: isOwnMess ? 20 : 0,
+                      left: isOwnMess ? "20%" : 0,
+                    },
                   ]}
                 >
                   {text}
                 </Text>
-                <Text style={[styles.dateText, { left: "25%" }]}>
-                  {stringWithoutGMT}
-                </Text>
-              </Pressable>
-            );
-          } else {
-            return (
-              <Pressable
-                style={[styles.viewText, { zIndex: -index }]}
-                onPress={(event: GestureResponderEvent) =>
-                  openMenu(event, item[0])
-                }
-              >
-                <Text style={[styles.text, { borderBottomRightRadius: 20 }]}>
-                  {text}
-                </Text>
-                <Text style={[styles.dateText, { left: 10 }]}>
-                  {stringWithoutGMT}
-                </Text>
-              </Pressable>
-            );
-          }
+              )}
+              <Text style={[styles.dateText, { left: isOwnMess ? "25%" : 10 }]}>
+                {stringWithoutGMT}
+              </Text>
+            </Pressable>
+          );
         }}
       />
       <MessageMenu
@@ -125,7 +126,7 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         closeMenu={closeMenu}
         copy={copy}
       />
-      {isOpen && <Pressable style={styles.overlay} onPress={closeMenu} />}
+      {isOpen && <Overlay close={closeMenu} />}
       <Hint
         bcColor={colors.success}
         text={"Successfully copy to clipboard."}
@@ -133,14 +134,14 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         close={closeHint}
       />
       {(isOpenChatMenu.isOpen || isOpenChatMenu.isOpenModule) && (
-        <Pressable style={styles.overlay} onPress={closeMenuChat} />
+        <Overlay close={closeMenuChat} />
       )}
       <ConfirmModule />
     </GestureHandlerRootView>
   );
 };
 
-const getStyles = (colors: ObjectColor, height: number, width: number) =>
+const getStyles = (colors: ObjectColor) =>
   StyleSheet.create({
     flatList: {
       gap: 10,
@@ -148,6 +149,13 @@ const getStyles = (colors: ObjectColor, height: number, width: number) =>
     viewText: {
       position: "relative",
       width: "100%",
+    },
+    image: {
+      width: 300,
+      height: 300,
+      borderWidth: 5,
+      borderRadius: 20,
+      borderColor: colors.headerBc,
     },
     text: {
       color: colors.text,
@@ -161,14 +169,5 @@ const getStyles = (colors: ObjectColor, height: number, width: number) =>
     dateText: {
       color: colors.text,
       position: "relative",
-    },
-    overlay: {
-      backgroundColor: "transparent",
-      height: height,
-      width: width,
-      position: "absolute",
-      top: 0,
-      left: 0,
-      zIndex: 0,
     },
   });
