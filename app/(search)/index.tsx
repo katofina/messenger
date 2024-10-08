@@ -6,12 +6,16 @@ import { useEffect, useState } from "react";
 import { Avatar } from "@/components/menu/Avatar";
 import useLanguage from "@/hooks/useLanguage";
 import searchByNick, { User } from "@/functions/firebase/searchByNick";
+import addToContacts from "@/functions/firebase/addToContacts";
+import { useSelector } from "react-redux";
+import { Store } from "@/redux/Store";
 
 export default function Search() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
 
   const params = useLocalSearchParams<{ input: string }>();
+  const stringRef = useSelector((store: Store) => store.authState.stringRef);
 
   const [data, setData] = useState<User[]>([]);
 
@@ -41,13 +45,13 @@ export default function Search() {
                   nick: item.nickname,
                   email: item.email,
                   photo: item.photoURL,
-                  online: item.online,
+                  online: String(item.online),
                 },
               }}
               asChild
               replace={true}
             >
-              <Pressable style={styles.userView}>
+              <Pressable style={styles.userView} onPress={() => addToContacts(stringRef, item.email,item.nickname)}>
                 <Avatar photo={item.photoURL} sizeImg={55} sizeView={55} />
                 <View style={styles.textView}>
                   <Text style={styles.text}>{item.nickname}</Text>

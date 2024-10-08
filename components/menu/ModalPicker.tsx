@@ -10,24 +10,21 @@ import {
   useWindowDimensions,
   Text,
   Pressable,
-  TouchableOpacity,
 } from "react-native";
 import { useEffect } from "react";
 import useThemeColor from "@/hooks/useThemeColor";
-import { AntDesign, Fontisto } from "@expo/vector-icons";
+import { Fontisto } from "@expo/vector-icons";
 
 interface Props {
   isOpen: boolean;
-  close: () => void;
   data: string[];
   title: string;
   active: string;
   onChange: (item: string) => void;
 }
 
-export const ModalTheme = ({
+export const ModalPicker = ({
   isOpen,
-  close,
   data,
   title,
   active,
@@ -54,12 +51,13 @@ export const ModalTheme = ({
       <View style={styles.container}>
         <View style={styles.titleView}>
           <Text style={styles.title}>{title}</Text>
-          <TouchableOpacity style={styles.close} onPress={close}>
-            <AntDesign name="close" size={26} color={colors.icon} />
-          </TouchableOpacity>
         </View>
         {data.map((item, index) => (
-          <Pressable key={index} style={styles.button} onPress={() => onChange(item)}>
+          <Pressable
+            key={index}
+            style={styles.button}
+            onPress={() => onChange(item)}
+          >
             {item === active ? (
               <Fontisto name="radio-btn-active" size={18} color={colors.icon} />
             ) : (
@@ -93,13 +91,6 @@ const getStyles = (colors: ObjectColor) =>
     title: {
       color: colors.text,
       fontSize: 20,
-    },
-    close: {
-      position: "absolute",
-      right: 10,
-      height: 30,
-      width: 30,
-      alignItems: "center",
     },
     container: {
       minHeight: 200,

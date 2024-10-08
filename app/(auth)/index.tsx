@@ -10,6 +10,7 @@ import { Link } from "expo-router";
 import useLanguage from "@/hooks/useLanguage";
 import { User } from "@/functions/firebase/searchByNick";
 import divideMessage from "@/functions/firebase/divideMessage";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface UserData {
   info: UserInfo;
@@ -57,18 +58,19 @@ export default function InitialAuth() {
       });
   }, []);
 
-  function createArrayInfo() {
+  async function createArrayInfo() {
     if (nicks.length) {
-      database()
-        .ref("nicknames")
-        .on("value", (snapshot) => {
-          const data = snapshot.val();
-          const arrayUserInfo: User[] = [];
-          for (let nick of nicks) {
+      const arrayUserInfo: User[] = [];
+      for (let nick of nicks) {
+        nick && await database()
+          .ref("nicknames")
+          .once("value")
+          .then((snapshot) => {
+            const data = snapshot.val();
             arrayUserInfo.push(data[nick]);
-          }
-          setUserInfo(arrayUserInfo);
-        });
+          });
+      }
+      setUserInfo(arrayUserInfo);
     }
   }
 
@@ -85,51 +87,54 @@ export default function InitialAuth() {
           data={nicks}
           renderItem={({ item, index }) => {
             const infoOfUser = userInfo[index];
-            const lastMessage = messages[index][infoOfUser.nickname];
-            const dividedMessage = lastMessage && divideMessage(lastMessage);
-            return (
-              <Link
-                href={{
-                  pathname: "/(chat)",
-                  params: {
-                    nick: infoOfUser.nickname,
-                    email: infoOfUser.email,
-                    photo: infoOfUser.photoURL,
-                    online: infoOfUser.online,
-                  },
-                }}
-                asChild
-              >
-                <Pressable style={styles.chat}>
-                  <Avatar
-                    photo={infoOfUser.photoURL}
-                    sizeImg={50}
-                    sizeView={50}
-                  />
-                  <View style={styles.textView}>
-                    {infoOfUser.online ? (
-                      <Text style={[styles.status, { color: colors.online }]}>
-                        {lang.online}
-                      </Text>
-                    ) : (
-                      <Text style={[styles.status, { color: colors.offline }]}>
-                        {lang.offline}
-                      </Text>
-                    )}
-                    <Text style={styles.nick}>{infoOfUser.nickname}</Text>
-                    {dividedMessage ? (
-                      <Text
-                        ellipsizeMode="tail"
-                        numberOfLines={1}
-                        style={styles.message}
-                      >
-                        {dividedMessage.text}
-                      </Text>
-                    ) : null}
-                  </View>
-                </Pressable>
-              </Link>
-            );
+            if (infoOfUser) {
+              const lastMessage = messages[index][infoOfUser.nickname];
+              const dividedMessage = lastMessage && divideMessage(lastMessage);
+              const isImage = dividedMessage && dividedMessage!.text.includes("imageURL:");
+              return (
+                <Link
+                  href={{
+                    pathname: "/(chat)",
+                    params: {
+                      nick: infoOfUser.nickname,
+                      email: infoOfUser.email,
+                      photo: infoOfUser.photoURL,
+                      online: String(infoOfUser.online),
+                    },
+                  }}
+                  asChild
+                >
+                  <Pressable style={styles.chat}>
+                    <Avatar
+                      photo={infoOfUser.photoURL}
+                      sizeImg={50}
+                      sizeView={50}
+                    />
+                    <View style={styles.textView}>
+                      {infoOfUser.online ? (
+                        <Text style={[styles.status, { color: colors.online }]}>
+                          {lang.online}
+                        </Text>
+                      ) : (
+                        <Text style={[styles.status, { color: colors.offline }]}>
+                          {lang.offline}
+                        </Text>
+                      )}
+                      <Text style={styles.nick}>{infoOfUser.nickname}</Text>
+                      {dividedMessage ? (
+                        <Text
+                          ellipsizeMode="tail"
+                          numberOfLines={1}
+                          style={styles.message}
+                        >
+                          {isImage ? "image" : dividedMessage.text}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </Pressable>
+                </Link>
+              );
+            } else return null;
           }}
         />
       ) : null}
