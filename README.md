@@ -1,50 +1,12 @@
-# Welcome to your Expo app 👋
+### Messenger Project
+Project for practice react-native (expo).
+In this pet project I tried to do messenger via realtime database. You can chat with other people, send image each other, search some user by nickname. There are some settings: changing theme(dark, light, system), changing languages (english or russian), changing nickname, additionally you can set profile photo. Authorization made via firebase and i used redirect by condition(authorized or not). Besides you can delete messages for yourself or for both, can delete all messages at once. Also can copy message to clipboard. Every message has date of sending, that can transform into local date(depend on user).
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Libraries: 
+1. @react-native-async-storage/async-storage - for saving theme and language.
+2. @react-native-firebase/ - authorization, saving/deleting images, messages.
+3. @react-navigation/drawer - in this project the base navigator on condition authorization is drawer navigator.
+4. @reduxjs/toolkit - is used for transfer authorization data to different components and to switch language and theme.
+5. expo-image-picker - to load image and photos from camera or from galery.
+6. react-native-reanimated - is used for effective animations (hints, modules).
+7. expo-clipboard - to copy text to clipboard.
