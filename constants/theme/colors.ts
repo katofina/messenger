@@ -19,6 +19,7 @@ export const colors: Colors = {
     offline: "#808080",
     online: "#4daffa",
     chatBc: "#f0f8ff",
+    messageOutside: "#dcdcdc",
   },
   dark: {
     text: "#d2d4d6",
@@ -38,5 +39,6 @@ export const colors: Colors = {
     offline: "#b3b3b3",
     online: "#4daffa",
     chatBc: "#444b52",
+    messageOutside: "#2b222e",
   },
 };

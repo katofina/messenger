@@ -8,6 +8,7 @@ import {
   Pressable,
   GestureResponderEvent,
   Image,
+  View,
 } from "react-native";
 import { MessageMenu } from "./MessageMenu";
 import { useEffect, useRef, useState } from "react";
@@ -56,7 +57,7 @@ export const AllMessages = ({ data, stringRef }: Props) => {
   const dispatch = useDispatch();
   const closeMenuChat = () => {
     dispatch(chatMenuState.actions.closeChatMenu());
-    dispatch(chatMenuState.actions.closeModule());
+    dispatch(chatMenuState.actions.closeConfirmModule());
   };
 
   const refFlat = useRef<FlatList<string[]>>(null);
@@ -94,6 +95,9 @@ export const AllMessages = ({ data, stringRef }: Props) => {
                       left: isOwnMess ? "20%" : 0,
                       borderBottomRightRadius: isOwnMess ? 0 : 20,
                       borderBottomLeftRadius: isOwnMess ? 20 : 0,
+                      borderColor: isOwnMess
+                        ? colors.headerBc
+                        : colors.messageOutside,
                     },
                   ]}
                 />
@@ -105,15 +109,20 @@ export const AllMessages = ({ data, stringRef }: Props) => {
                       borderBottomRightRadius: isOwnMess ? 0 : 20,
                       borderBottomLeftRadius: isOwnMess ? 20 : 0,
                       left: isOwnMess ? "20%" : 0,
+                      backgroundColor: isOwnMess
+                        ? colors.headerBc
+                        : colors.messageOutside,
                     },
                   ]}
                 >
                   {text}
                 </Text>
               )}
-              <Text style={[styles.dateText, { left: isOwnMess ? "25%" : 10 }]}>
-                {stringWithoutGMT}
-              </Text>
+              <View style={{alignItems: isOwnMess ? "flex-end" : "flex-start"}}>
+                <Text style={[styles.dateText]}>
+                  {stringWithoutGMT}
+                </Text>
+              </View>
             </Pressable>
           );
         }}
@@ -133,7 +142,8 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         isOpen={isHint}
         close={closeHint}
       />
-      {(isOpenChatMenu.isOpen || isOpenChatMenu.isOpenModule) && (
+      {(isOpenChatMenu.isOpenChatMenu ||
+        isOpenChatMenu.isOpenConfirmModule) && (
         <Overlay close={closeMenuChat} />
       )}
       <ConfirmModule />
@@ -155,7 +165,6 @@ const getStyles = (colors: ObjectColor) =>
       height: 300,
       borderWidth: 5,
       borderRadius: 20,
-      borderColor: colors.headerBc,
     },
     text: {
       color: colors.text,
@@ -163,11 +172,11 @@ const getStyles = (colors: ObjectColor) =>
       paddingLeft: 10,
       borderTopRightRadius: 20,
       borderTopLeftRadius: 20,
-      backgroundColor: colors.headerBc,
       width: "80%",
+      shadowColor: colors.shadowColor,
+      elevation: 10,
     },
     dateText: {
       color: colors.text,
-      position: "relative",
     },
   });

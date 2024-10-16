@@ -27,12 +27,13 @@ export function DrawerContent() {
   function logOut() {
     auth()
       .signOut()
-      .then(() => {    database()
-        .ref("nicknames/" + user.nick)
-        .update({ online: false });
-        router.replace("/InitialNotAuth")
+      .then(() => {
+        database()
+          .ref("nicknames/" + user.nick)
+          .update({ online: false });
+        router.replace("/InitialNotAuth");
+        dispatch(authState.actions.deleteUserData());
       });
-    dispatch(authState.actions.deleteUserData());
   }
 
   return (

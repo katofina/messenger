@@ -106,15 +106,15 @@ const getStyles = (colors: ObjectColor) =>
       width: "100%",
       padding: 10,
       flexDirection: "row",
-          gap: 10,
-          zIndex: 5,
-      backgroundColor: colors.background
+      gap: 10,
+      zIndex: 5,
+      backgroundColor: colors.background,
     },
     deleteView: {
       backgroundColor: colors.error,
       justifyContent: "center",
       width: "100%",
-        alignItems: "flex-end",
+      alignItems: "flex-end",
     },
     textView: {
       width: "80%",

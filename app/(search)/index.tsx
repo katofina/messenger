@@ -15,7 +15,7 @@ export default function Search() {
   const styles = getStyles(colors);
 
   const params = useLocalSearchParams<{ input: string }>();
-  const stringRef = useSelector((store: Store) => store.authState.stringRef);
+  const userInfo = useSelector((store: Store) => store.authState);
 
   const [data, setData] = useState<User[]>([]);
 
@@ -51,7 +51,7 @@ export default function Search() {
               asChild
               replace={true}
             >
-              <Pressable style={styles.userView} onPress={() => addToContacts(stringRef, item.email,item.nickname)}>
+              <Pressable style={styles.userView} onPress={() => addToContacts(userInfo.stringRef, item.email, item.nickname, userInfo.nick)}>
                 <Avatar photo={item.photoURL} sizeImg={55} sizeView={55} />
                 <View style={styles.textView}>
                   <Text style={styles.text}>{item.nickname}</Text>
