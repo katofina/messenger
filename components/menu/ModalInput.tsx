@@ -146,6 +146,7 @@ const getStyles = (colors: ObjectColor) =>
       justifyContent: "center",
       height: 220,
       width: "100%",
+      zIndex: 1
     },
     container: {
       width: 300,

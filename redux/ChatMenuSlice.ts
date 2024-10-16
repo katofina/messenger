@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface ChatMenuState {
-  isOpen: boolean;
-  isOpenModule: boolean;
+  isOpenChatMenu: boolean;
+  isOpenConfirmModule: boolean;
 }
 
 const initialState: ChatMenuState = {
-  isOpen: false,
-  isOpenModule: false,
+  isOpenChatMenu: false,
+  isOpenConfirmModule: false,
 };
 
 export const chatMenuState = createSlice({
@@ -15,16 +15,16 @@ export const chatMenuState = createSlice({
   initialState,
   reducers: {
     openChatMenu: (state) => {
-      state.isOpen = true;
+      state.isOpenChatMenu = true;
     },
     closeChatMenu: (state) => {
-      state.isOpen = false;
+      state.isOpenChatMenu = false;
     },
-    openModule: (state) => {
-      state.isOpenModule = true;
+    openConfirmModule: (state) => {
+      state.isOpenConfirmModule = true;
     },
-    closeModule: (state) => {
-      state.isOpenModule = false;
+    closeConfirmModule: (state) => {
+      state.isOpenConfirmModule = false;
     },
   },
 });

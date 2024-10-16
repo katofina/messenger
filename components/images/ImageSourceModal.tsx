@@ -57,7 +57,6 @@ export const ImageSourceModal = ({ isOpen, onLoad, closeModal }: Prop) => {
   const [isLoading, setIsLoading] = useState(false);
   const isCancelRef = useRef<null | boolean>(null);
   const pickGalery = async () => {
-    setIsLoading(true);
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -65,16 +64,17 @@ export const ImageSourceModal = ({ isOpen, onLoad, closeModal }: Prop) => {
       quality: 1,
     });
     if (!result.canceled) {
+      setIsLoading(true);
       getResultLoad(result.assets[0].uri);
     } else closeModal();
   };
   const pickCamera = async () => {
-    setIsLoading(true);
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       quality: 1,
     });
     if (!result.canceled) {
+      setIsLoading(true);
       getResultLoad(result.assets[0].uri);
     } else closeModal();
   };

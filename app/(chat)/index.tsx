@@ -26,6 +26,7 @@ import { Overlay } from "@/components/overlay/Overlay";
 
 export default function Chat() {
   const { email } = useLocalSearchParams();
+
   const stringRef = useSelector((store: Store) => store.authState.stringRef);
 
   const headerHeight = useHeaderHeight();

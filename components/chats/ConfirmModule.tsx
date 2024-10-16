@@ -12,27 +12,51 @@ import {
   useWindowDimensions,
   Pressable,
 } from "react-native";
-import Animated, { useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { useDispatch, useSelector } from "react-redux";
 import database from "@react-native-firebase/database";
 import { useLocalSearchParams } from "expo-router";
 
-export const ConfirmModule = () => {
+interface Prop {
+  emailProp?: string;
+}
+
+export const ConfirmModule = ({ emailProp }: Prop) => {
   const [isDeleteAll, setIsDeleteAll] = useState(false);
   function checkDeleteForBoth() {
     setIsDeleteAll((prev) => !prev);
-  };
+  }
   const { email } = useLocalSearchParams();
   const user = useSelector((store: Store) => store.authState);
   function deleteAllMessages() {
+    const neededEmail = email || emailProp;
+    const userRef = user.stringRef + "/chats/" + neededEmail;
+    const contactRef = neededEmail + "/chats/" + user.stringRef;
     if (isDeleteAll) {
-      database().ref(user.stringRef + "/chats/" + email + "/messages").remove();
-      database().ref(email + "/chats/" + user.stringRef + "/messages").remove();
-      closeModule();
+      if (email) {
+        database()
+          .ref(userRef + "/messages")
+          .remove();
+        database()
+          .ref(contactRef + "/messages")
+          .remove();
+      }
+      if (emailProp) {
+        database().ref(userRef).remove();
+        database().ref(contactRef).remove();
+      }
     } else {
-      database().ref(user.stringRef + "/chats/" + email + "/messages").remove();
-      closeModule();
-    };
+      email &&
+        database()
+          .ref(userRef + "/messages")
+          .remove();
+      emailProp && database().ref(userRef).remove();
+    }
+    closeModule();
   }
 
   const { colors } = useThemeColor();
@@ -40,7 +64,7 @@ export const ConfirmModule = () => {
   const lang = useLanguage();
 
   const isOpen = useSelector(
-    (store: Store) => store.chatMenuState.isOpenModule,
+    (store: Store) => store.chatMenuState.isOpenConfirmModule,
   );
   const height = useWindowDimensions().height;
   const translateY = useSharedValue(height);
@@ -51,12 +75,12 @@ export const ConfirmModule = () => {
 
   const dispatch = useDispatch();
   function closeModule() {
-    dispatch(chatMenuState.actions.closeModule());
+    dispatch(chatMenuState.actions.closeConfirmModule());
     dispatch(chatMenuState.actions.closeChatMenu());
-  };
+  }
 
   return (
-    <Animated.View style={[styles.container, {transform: [{translateY}]}]}>
+    <Animated.View style={[styles.container, { transform: [{ translateY }] }]}>
       <Text style={styles.mainText}>{lang.confirmOfDeleteAll}</Text>
       <Pressable style={styles.confirmView} onPress={checkDeleteForBoth}>
         {isDeleteAll ? (
@@ -85,11 +109,12 @@ const getStyles = (colors: ObjectColor) =>
       shadowColor: colors.shadowColor,
       elevation: 10,
       height: 200,
-      width: '70%',
-      left: '15%',
+      width: "70%",
+      left: "15%",
       position: "absolute",
       alignItems: "center",
-      gap: 10
+      gap: 10,
+      zIndex: 1,
     },
     mainText: {
       color: colors.text,
@@ -107,8 +132,8 @@ const getStyles = (colors: ObjectColor) =>
       fontSize: 20,
     },
     buttonView: {
-      flexDirection: 'row',
-      gap: 20
+      flexDirection: "row",
+      gap: 20,
     },
     button: {
       backgroundColor: colors.button,
@@ -116,7 +141,7 @@ const getStyles = (colors: ObjectColor) =>
       elevation: 10,
       width: 55,
       height: 45,
-      alignItems: 'center',
-      justifyContent: 'center'
-    }
+      alignItems: "center",
+      justifyContent: "center",
+    },
   });

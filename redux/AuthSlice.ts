@@ -29,5 +29,11 @@ export const authState = createSlice({
     setPhoto: (state, action: PayloadAction<string>) => {
       state.photoURL = action.payload;
     },
+    deleteUserData: (state) => {
+      state.nick = "";
+      state.email = "";
+      state.photoURL = "";
+      state.stringRef = "";
+    },
   },
 });

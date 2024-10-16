@@ -6,7 +6,8 @@ export default async function includesNick(nickname: string) {
     .once("value")
     .then((snapshot) => {
       const data = snapshot.val();
-      return Object.keys(data);
+      if (data) return Object.keys(data);
+      return null;
     });
   return nicknames ? nicknames.includes(nickname) : false;
 }

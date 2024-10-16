@@ -58,8 +58,8 @@ export default function Settings() {
 
   function onChangeTheme(item: string) {
     dispatch(themeState.actions.setTheme(item as ThemeString));
-    setIsThemeModal(false);
     AsyncStorage.setItem('theme', item);
+    setIsThemeModal(false);
   };
 
   const [hint, setHint] = useState({ color: "", text: "", isOpen: false });

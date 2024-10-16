@@ -82,6 +82,7 @@ const getStyles = (colors: ObjectColor) =>
       width: "100%",
       justifyContent: "center",
       alignItems: "center",
+      zIndex: 1
     },
     titleView: {
       flexDirection: "row",

@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "1034524766131",
-    "firebase_url": "https://messenger-3743c-default-rtdb.firebaseio.com",
-    "project_id": "messenger-3743c",
-    "storage_bucket": "messenger-3743c.appspot.com"
+    "project_number": "859278403041",
+    "project_id": "messenger-f72b1",
+    "storage_bucket": "messenger-f72b1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1034524766131:android:846d5429020984661325c6",
+        "mobilesdk_app_id": "1:859278403041:android:6d229d6071101a59865ea0",
         "android_client_info": {
           "package_name": "com.katofina.messenger"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBrOZdD3yNhhF4Fd6HapuqSsvhi0ZEArw8"
+          "current_key": "AIzaSyAu2Tkobw6id3oRKwQNmpXYDt0dinIY41Q"
         }
       ],
       "services": {

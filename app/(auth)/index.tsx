@@ -1,17 +1,23 @@
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
-import { useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList, Pressable } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import database from "@react-native-firebase/database";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
-import { Avatar } from "@/components/menu/Avatar";
-import { Link } from "expo-router";
 import useLanguage from "@/hooks/useLanguage";
 import { User } from "@/functions/firebase/searchByNick";
 import divideMessage from "@/functions/firebase/divideMessage";
-import { MaterialIcons } from "@expo/vector-icons";
-
+import { EveryDialog } from "@/components/chats/EveryDialog";
+import { ConfirmModule } from "@/components/chats/ConfirmModule";
+import { Overlay } from "@/components/overlay/Overlay";
+import { chatMenuState } from "@/redux/ChatMenuSlice";
 interface UserData {
   info: UserInfo;
   messages: string[];
@@ -36,6 +42,7 @@ export default function InitialAuth() {
   const [messages, setMessages] = useState<Messages[]>([]);
   const nick = useSelector((store: Store) => store.authState.nick);
   const [userInfo, setUserInfo] = useState<User[]>([]); //indexes like nicks
+  const [isLoad, setIsLoad] = useState(true);
 
   useEffect(() => {
     database()
@@ -49,11 +56,16 @@ export default function InitialAuth() {
             if (item.messages) {
               const lastMessage = Object.values(item.messages).at(-1);
               return { [nickname]: lastMessage! };
-            } else return { [nickname]: null };
+            } else {
+              return { [nickname]: null };
+            }
           });
           const nicksFromValues = values.map((item) => item.info.nick);
           setNicks(nicksFromValues);
           setMessages(messagesFromValues);
+        } else {
+          setIsLoad(false);
+          setNicks([]);
         }
       });
   }, []);
@@ -62,14 +74,16 @@ export default function InitialAuth() {
     if (nicks.length) {
       const arrayUserInfo: User[] = [];
       for (let nick of nicks) {
-        nick && await database()
-          .ref("nicknames")
-          .once("value")
-          .then((snapshot) => {
-            const data = snapshot.val();
-            arrayUserInfo.push(data[nick]);
-          });
+        nick &&
+          (await database()
+            .ref("nicknames")
+            .once("value")
+            .then((snapshot) => {
+              const data = snapshot.val();
+              arrayUserInfo.push(data[nick]);
+            }));
       }
+      setIsLoad(false);
       setUserInfo(arrayUserInfo);
     }
   }
@@ -80,64 +94,52 @@ export default function InitialAuth() {
 
   const lang = useLanguage();
 
+  const isOpenConfirmModule = useSelector((store: Store) => store.chatMenuState.isOpenConfirmModule);
+  const dispatch = useDispatch();
+  const emailRef = useRef("");
+
   return (
     <View style={styles.container}>
-      {nicks.length && userInfo.length ? (
+      {isLoad && (
+        <ActivityIndicator
+          style={styles.indicator}
+          size={"large"}
+          color={colors.text}
+        />
+      )}
+      {nicks.length && userInfo.length && !isLoad ? (
         <FlatList
           data={nicks}
           renderItem={({ item, index }) => {
             const infoOfUser = userInfo[index];
             if (infoOfUser) {
+              emailRef.current = infoOfUser.email;
               const lastMessage = messages[index][infoOfUser.nickname];
               const dividedMessage = lastMessage && divideMessage(lastMessage);
-              const isImage = dividedMessage && dividedMessage!.text.includes("imageURL:");
+              const isImage =
+                dividedMessage && dividedMessage!.text.includes("imageURL:");
               return (
-                <Link
-                  href={{
-                    pathname: "/(chat)",
-                    params: {
-                      nick: infoOfUser.nickname,
-                      email: infoOfUser.email,
-                      photo: infoOfUser.photoURL,
-                      online: String(infoOfUser.online),
-                    },
-                  }}
-                  asChild
-                >
-                  <Pressable style={styles.chat}>
-                    <Avatar
-                      photo={infoOfUser.photoURL}
-                      sizeImg={50}
-                      sizeView={50}
-                    />
-                    <View style={styles.textView}>
-                      {infoOfUser.online ? (
-                        <Text style={[styles.status, { color: colors.online }]}>
-                          {lang.online}
-                        </Text>
-                      ) : (
-                        <Text style={[styles.status, { color: colors.offline }]}>
-                          {lang.offline}
-                        </Text>
-                      )}
-                      <Text style={styles.nick}>{infoOfUser.nickname}</Text>
-                      {dividedMessage ? (
-                        <Text
-                          ellipsizeMode="tail"
-                          numberOfLines={1}
-                          style={styles.message}
-                        >
-                          {isImage ? "image" : dividedMessage.text}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </Pressable>
-                </Link>
+                <EveryDialog
+                  nick={infoOfUser.nickname}
+                  email={infoOfUser.email}
+                  photo={infoOfUser.photoURL}
+                  online={infoOfUser.online}
+                  dividedMessage={dividedMessage}
+                  isImage={isImage}
+                />
               );
             } else return null;
           }}
         />
-      ) : null}
+      ) : (
+        !isLoad && (
+          <View style={styles.absenceDialogs}>
+            <Text style={styles.text}>{lang.absenceDialogs}</Text>
+          </View>
+        )
+      )}
+      <ConfirmModule emailProp={emailRef.current}/>
+      {isOpenConfirmModule && <Overlay close={() => dispatch(chatMenuState.actions.closeConfirmModule())}/>}
     </View>
   );
 }
@@ -148,30 +150,15 @@ const getStyles = (colors: ObjectColor) =>
       height: "100%",
       backgroundColor: colors.background,
     },
+    indicator: {
+      margin: 20,
+    },
     text: {
       color: colors.text,
       padding: 20,
     },
-    chat: {
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.borderInput,
+    absenceDialogs: {
       width: "100%",
-      padding: 10,
-      flexDirection: "row",
-      gap: 10,
-    },
-    textView: {
-      width: "80%",
-    },
-    nick: {
-      fontSize: 18,
-      color: colors.text,
-    },
-    message: {
-      color: colors.offline,
-    },
-    status: {
-      position: "absolute",
-      right: 0,
+      alignItems: "center",
     },
   });

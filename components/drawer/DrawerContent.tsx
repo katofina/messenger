@@ -6,10 +6,11 @@ import { ObjectColor } from "@/constants/theme/types";
 import { Entypo, Feather } from "@expo/vector-icons";
 import auth from "@react-native-firebase/auth";
 import { router } from "expo-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import useLanguage from "@/hooks/useLanguage";
 import database from "@react-native-firebase/database";
+import { authState } from "@/redux/AuthSlice";
 
 export function DrawerContent() {
   const { colors } = useThemeColor();
@@ -17,6 +18,7 @@ export function DrawerContent() {
   const lang = useLanguage();
 
   const user = useSelector((store: Store) => store.authState);
+  const dispatch = useDispatch();
 
   function goToSettings() {
     router.navigate("/(settings)");
@@ -28,7 +30,9 @@ export function DrawerContent() {
       .then(() => {    database()
         .ref("nicknames/" + user.nick)
         .update({ online: false });
-        router.replace("/InitialNotAuth")});
+        router.replace("/InitialNotAuth")
+      });
+    dispatch(authState.actions.deleteUserData());
   }
 
   return (

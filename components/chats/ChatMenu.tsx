@@ -13,7 +13,7 @@ export default function ChatMenu() {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
 
-  const isOpen = useSelector((store: Store) => store.chatMenuState.isOpen);
+  const isOpen = useSelector((store: Store) => store.chatMenuState.isOpenChatMenu);
   useEffect(() => {
     if (isOpen) translateX.value = withTiming(0);
     else translateX.value = withTiming(width);
@@ -24,7 +24,7 @@ export default function ChatMenu() {
 
   const dispatch = useDispatch();
   function openModule() {
-    dispatch(chatMenuState.actions.openModule());
+    dispatch(chatMenuState.actions.openConfirmModule());
   };
 
   return (
