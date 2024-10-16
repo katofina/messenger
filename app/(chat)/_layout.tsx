@@ -3,11 +3,14 @@ import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { View, StyleSheet, Text, Pressable } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Entypo } from "@expo/vector-icons";
 import { chatMenuState } from "@/redux/ChatMenuSlice";
 import ChatMenu from "@/components/chats/ChatMenu";
 import useLanguage from "@/hooks/useLanguage";
+import { Store } from "@/redux/Store";
+import { Overlay } from "@/components/overlay/Overlay";
+import { ResizingImage } from "@/components/images/ResizingImage";
 
 export default function ChatLayout() {
   const { colors } = useThemeColor();
@@ -25,6 +28,7 @@ export default function ChatLayout() {
   function openMenu() {
     dispatch(chatMenuState.actions.openChatMenu());
   }
+  const isOpenMenu = useSelector((store: Store) => store.chatMenuState.isOpenChatMenu);
 
   return (
     <Stack initialRouteName="index">
@@ -37,7 +41,7 @@ export default function ChatLayout() {
           headerRight: () => (
             <>
               <View style={styles.container}>
-                <Avatar photo={photo} sizeImg={45} sizeView={45} />
+                <ResizingImage url={photo} sizeImg={45} sizeView={45}/>
                 <View style={styles.textView}>
                   <Text style={styles.nick}>{nick}</Text>
                   {online === "true" ? (
@@ -51,6 +55,7 @@ export default function ChatLayout() {
                 <Entypo name="menu" size={24} color={colors.icon} />
               </Pressable>
               <ChatMenu />
+              {isOpenMenu && <Overlay close={() => dispatch(chatMenuState.actions.closeChatMenu())}/>}
             </>
           ),
         }}

@@ -1,6 +1,5 @@
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { View, Text, StyleSheet } from "react-native";
-import { Avatar } from "../menu/Avatar";
 import useThemeColor from "@/hooks/useThemeColor";
 import { ObjectColor } from "@/constants/theme/types";
 import { Entypo, Feather } from "@expo/vector-icons";
@@ -11,6 +10,7 @@ import { Store } from "@/redux/Store";
 import useLanguage from "@/hooks/useLanguage";
 import database from "@react-native-firebase/database";
 import { authState } from "@/redux/AuthSlice";
+import { ResizingImage } from "../images/ResizingImage";
 
 export function DrawerContent() {
   const { colors } = useThemeColor();
@@ -40,7 +40,7 @@ export function DrawerContent() {
     <View style={styles.container}>
       <DrawerContentScrollView>
         <View style={styles.avatarView}>
-          <Avatar photo={user.photoURL} sizeImg={80} sizeView={80} />
+          <ResizingImage url={user.photoURL} sizeImg={80} sizeView={80}/>
           <Text style={styles.nick}>{user.nick}</Text>
         </View>
         <DrawerItem
