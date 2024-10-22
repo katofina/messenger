@@ -7,6 +7,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  AppState
 } from "react-native";
 import database from "@react-native-firebase/database";
 import { useDispatch, useSelector } from "react-redux";
@@ -68,6 +69,15 @@ export default function InitialAuth() {
           setNicks([]);
         }
       });
+
+      const subscription = AppState.addEventListener('change', state => {
+        console.log(state);
+        if (state === "background") database().ref("nicknames/" + nick).update({ online: false });
+        if (state === "active") database().ref("nicknames/" + nick).update({ online: true });
+      })
+      return () => {
+        subscription.remove();
+      };
   }, []);
 
   async function createArrayInfo() {
