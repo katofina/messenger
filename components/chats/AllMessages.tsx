@@ -9,7 +9,7 @@ import {
   GestureResponderEvent,
   Image,
   View,
-  Share
+  Share,
 } from "react-native";
 import { MessageMenu } from "./MessageMenu";
 import { useEffect, useRef, useState } from "react";

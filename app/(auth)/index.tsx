@@ -7,7 +7,8 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
-  AppState
+  AppState,
+  RefreshControl,
 } from "react-native";
 import database from "@react-native-firebase/database";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,7 +46,7 @@ export default function InitialAuth() {
   const [userInfo, setUserInfo] = useState<User[]>([]); //indexes like nicks
   const [isLoad, setIsLoad] = useState(true);
 
-  useEffect(() => {
+  function loadNicksAndMessages() {
     database()
       .ref(nick + "/chats")
       .on("value", (snapshot) => {
@@ -69,14 +70,24 @@ export default function InitialAuth() {
           setNicks([]);
         }
       });
+  }
 
-      const subscription = AppState.addEventListener('change', state => {
-        if (state === "background") database().ref("nicknames/" + nick).update({ online: false });
-        if (state === "active") database().ref("nicknames/" + nick).update({ online: true });
-      })
-      return () => {
-        subscription.remove();
-      };
+  useEffect(() => {
+    loadNicksAndMessages();
+
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "background")
+        database()
+          .ref("nicknames/" + nick)
+          .update({ online: false });
+      if (state === "active")
+        database()
+          .ref("nicknames/" + nick)
+          .update({ online: true });
+    });
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   async function createArrayInfo() {
@@ -103,9 +114,17 @@ export default function InitialAuth() {
 
   const lang = useLanguage();
 
-  const isOpenConfirmModule = useSelector((store: Store) => store.chatMenuState.isOpenConfirmModule);
+  const isOpenConfirmModule = useSelector(
+    (store: Store) => store.chatMenuState.isOpenConfirmModule,
+  );
   const dispatch = useDispatch();
   const emailRef = useRef("");
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const onRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => setIsRefreshing(false), 2000);
+  };
 
   return (
     <View style={styles.container}>
@@ -119,6 +138,9 @@ export default function InitialAuth() {
       {nicks.length && userInfo.length && !isLoad ? (
         <FlatList
           data={nicks}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+          }
           renderItem={({ item, index }) => {
             const infoOfUser = userInfo[index];
             if (infoOfUser) {
@@ -147,8 +169,12 @@ export default function InitialAuth() {
           </View>
         )
       )}
-      <ConfirmModule emailProp={emailRef.current}/>
-      {isOpenConfirmModule && <Overlay close={() => dispatch(chatMenuState.actions.closeConfirmModule())}/>}
+      <ConfirmModule emailProp={emailRef.current} />
+      {isOpenConfirmModule && (
+        <Overlay
+          close={() => dispatch(chatMenuState.actions.closeConfirmModule())}
+        />
+      )}
     </View>
   );
 }
