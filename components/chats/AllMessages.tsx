@@ -9,6 +9,7 @@ import {
   GestureResponderEvent,
   Image,
   View,
+  Share
 } from "react-native";
 import { MessageMenu } from "./MessageMenu";
 import { useEffect, useRef, useState } from "react";
@@ -20,6 +21,7 @@ import { Store } from "@/redux/Store";
 import { chatMenuState } from "@/redux/ChatMenuSlice";
 import { ConfirmModule } from "./ConfirmModule";
 import { Overlay } from "../overlay/Overlay";
+import useLanguage from "@/hooks/useLanguage";
 
 interface Props {
   data: string[][];
@@ -29,14 +31,17 @@ interface Props {
 export const AllMessages = ({ data, stringRef }: Props) => {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
+  const lang = useLanguage();
 
   const [isOpen, setIsOpen] = useState(false);
   const layoutY = useRef(0);
-  const position = useRef("");
+  const messageInfo = useRef({message: "", position: ""});
 
   function openMenu(event: GestureResponderEvent, index: string) {
     layoutY.current = event.nativeEvent.pageY;
-    position.current = index;
+    const message = data.find((item) => item[0] === index)!;
+    const { text } = divideMessage(message[1]);
+    messageInfo.current = {message: text, position: index};
     setIsOpen(true);
   }
   function closeMenu() {
@@ -44,9 +49,7 @@ export const AllMessages = ({ data, stringRef }: Props) => {
   }
 
   async function copy() {
-    const message = data.find((item) => item[0] === position.current)!;
-    const { text } = divideMessage(message[1]);
-    await Clipboard.setStringAsync(text);
+    await Clipboard.setStringAsync(messageInfo.current.message);
     setIsHint(true);
     closeMenu();
   }
@@ -67,6 +70,10 @@ export const AllMessages = ({ data, stringRef }: Props) => {
   useEffect(() => {
     scrollEnd;
   }, [data]);
+
+  function share() {
+    Share.share({message: messageInfo.current.message, title: lang.share});
+  };
 
   return (
     <GestureHandlerRootView>
@@ -131,9 +138,10 @@ export const AllMessages = ({ data, stringRef }: Props) => {
         isOpen={isOpen}
         layoutY={layoutY.current}
         stringRef={stringRef}
-        position={position.current}
+        position={messageInfo.current.position}
         closeMenu={closeMenu}
         copy={copy}
+        share={share}
       />
       {isOpen && <Overlay close={closeMenu} />}
       <Hint

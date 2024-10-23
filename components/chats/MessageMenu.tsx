@@ -7,7 +7,6 @@ import useLanguage from "@/hooks/useLanguage";
 import database from "@react-native-firebase/database";
 import { useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { Overlay } from "../overlay/Overlay";
 
 interface Prop {
   isOpen: boolean;
@@ -16,9 +15,10 @@ interface Prop {
   position: string;
   closeMenu: () => void;
   copy: () => void;
+  share: () => void;
 }
 
-const MENU_HEIGHT = 120;
+const MENU_HEIGHT = 160;
 
 export const MessageMenu = ({
   isOpen,
@@ -27,6 +27,7 @@ export const MessageMenu = ({
   position,
   closeMenu,
   copy,
+  share,
 }: Prop) => {
   const { colors } = useThemeColor();
   const styles = getStyles(colors);
@@ -69,6 +70,9 @@ export const MessageMenu = ({
         },
       ]}
     >
+      <Pressable style={styles.button} onPress={share}>
+        <Text style={styles.text}>{lang.share}</Text>
+      </Pressable>
       <Pressable style={styles.button} onPress={copy}>
         <Text style={styles.text}>{lang.copy}</Text>
       </Pressable>

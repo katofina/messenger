@@ -71,7 +71,6 @@ export default function InitialAuth() {
       });
 
       const subscription = AppState.addEventListener('change', state => {
-        console.log(state);
         if (state === "background") database().ref("nicknames/" + nick).update({ online: false });
         if (state === "active") database().ref("nicknames/" + nick).update({ online: true });
       })

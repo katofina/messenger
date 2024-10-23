@@ -47,6 +47,7 @@ export const translation = {
     chooseSource: "Choose Source:",
     uploadProfilePhoto: "Upload Profile Photo",
     absenceDialogs: "You don't have any dialog yet.",
+    share: "Share",
   },
   ru: {
     welcome: "Добро пожаловать в Messenger",
@@ -96,5 +97,6 @@ export const translation = {
     chooseSource: "Выберите источник:",
     uploadProfilePhoto: "Загрузить фото профиля",
     absenceDialogs: "У вас ещё нет ни одного диалога.",
+    share: "Поделиться",
   },
 };
