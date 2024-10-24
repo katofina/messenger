@@ -1,6 +1,6 @@
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -10,7 +10,7 @@ import {
   AppState,
   RefreshControl,
 } from "react-native";
-import database from "@react-native-firebase/database";
+import database, { update } from "@react-native-firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import useLanguage from "@/hooks/useLanguage";
@@ -46,71 +46,70 @@ export default function InitialAuth() {
   const [userInfo, setUserInfo] = useState<User[]>([]); //indexes like nicks
   const [isLoad, setIsLoad] = useState(true);
 
-  function loadNicksAndMessages() {
-    database()
-      .ref(nick + "/chats")
-      .on("value", (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const values: UserData[] = Object.values(data);
-          const messagesFromValues = values.map((item) => {
-            const nickname = item.info.nick;
-            if (item.messages) {
-              const lastMessage = Object.values(item.messages).at(-1);
-              return { [nickname]: lastMessage! };
-            } else {
-              return { [nickname]: null };
-            }
-          });
-          const nicksFromValues = values.map((item) => item.info.nick);
-          setNicks(nicksFromValues);
-          setMessages(messagesFromValues);
-        } else {
-          setIsLoad(false);
-          setNicks([]);
-        }
-      });
-  }
+  const loadNicksAndMessages = useCallback(() => {
+    const chatRef = database().ref(nick + "/chats");
+
+    chatRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const values: UserData[] = Object.values(data);
+
+        const messagesFromValues = values.map((item) => {
+          const lastMessage = item.messages
+            ? Object.values(item.messages).at(-1)
+            : null;
+          return { [item.info.nick]: lastMessage! };
+        });
+
+        const nicksFromValues = values.map((item) => item.info.nick);
+
+        setNicks(nicksFromValues);
+        setMessages(messagesFromValues);
+      } else {
+        setNicks([]);
+      }
+      setIsLoad(false);
+    });
+  }, [nick]);
+
+  const updateOnlineStatus = useCallback(
+    (isOnline: boolean) => {
+      database()
+        .ref("nicknames/" + nick)
+        .update({ online: isOnline });
+    },
+    [nick],
+  );
 
   useEffect(() => {
     loadNicksAndMessages();
 
     const subscription = AppState.addEventListener("change", (state) => {
-      if (state === "background")
-        database()
-          .ref("nicknames/" + nick)
-          .update({ online: false });
-      if (state === "active")
-        database()
-          .ref("nicknames/" + nick)
-          .update({ online: true });
+      updateOnlineStatus(state === "active");
     });
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [loadNicksAndMessages, updateOnlineStatus]);
 
-  async function createArrayInfo() {
+  function createArrayInfo() {
     if (nicks.length) {
-      const arrayUserInfo: User[] = [];
-      for (let nick of nicks) {
-        nick &&
-          (await database()
-            .ref("nicknames")
-            .once("value")
-            .then((snapshot) => {
-              const data = snapshot.val();
-              arrayUserInfo.push(data[nick]);
-            }));
-      }
-      setIsLoad(false);
-      setUserInfo(arrayUserInfo);
+      database()
+        .ref("nicknames")
+        .on("value", (snapshot) => {
+          const data = snapshot.val();
+          const arrayUserInfo: User[] = [];
+          for (let nick of nicks) {
+            arrayUserInfo.push(data[nick]);
+          }
+          setUserInfo(arrayUserInfo);
+        });
     }
   }
 
   useEffect(() => {
     createArrayInfo();
-  }, [nicks]);
+  }, [nicks, createArrayInfo]);
 
   const lang = useLanguage();
 

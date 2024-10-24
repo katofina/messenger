@@ -17,12 +17,10 @@ export default function InitialNotAuth() {
 
   const marginLeft = useSharedValue(0);
   useEffect(() => {
-    marginLeft.value = withTiming(
-      40,
-      { duration: 1000 },
+    marginLeft.value = withTiming(40,{ duration: 1000 },
       () => (marginLeft.value = withSpring(0)),
     );
-  }, []);
+  }, [marginLeft]);
 
   const lang = useLanguage();
 
@@ -32,7 +30,7 @@ export default function InitialNotAuth() {
       <Link href="/(sign)/SignUp" asChild>
         <TouchableOpacity style={styles.button}>
           <Text style={styles.text}>{lang.start}</Text>
-          <Animated.View style={styles.animView}>
+          <Animated.View style={[styles.animView, {marginLeft}]}>
             <Entypo name="chevron-small-right" size={24} color={colors.icon} />
           </Animated.View>
         </TouchableOpacity>

@@ -15,31 +15,37 @@ export default function Index() {
   const dispatch = useDispatch();
 
   async function getFromStorage() {
-    const theme = await AsyncStorage.getItem("theme");
-    const lang = await AsyncStorage.getItem("lang");
-    theme && dispatch(themeState.actions.setTheme(theme as ThemeString));
-    lang && dispatch(langState.actions.setLang(lang as LanguageString));
+    try {
+      const [theme, lang] = await Promise.all([
+        AsyncStorage.getItem("theme"),
+        AsyncStorage.getItem("lang"),
+      ]);
+      if (theme) dispatch(themeState.actions.setTheme(theme as ThemeString));
+      if (lang) dispatch(langState.actions.setLang(lang as LanguageString));
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   useEffect(() => {
     getFromStorage();
   }, []);
-
-  function setOnline(nick: string) {
-    database()
-      .ref("nicknames/" + nick)
-      .update({ online: true });
-  };
-
+  
   auth().onAuthStateChanged((user) => {
     if (user) {
       setOnline(user.displayName!);
       setIsAuth(true);
       dispatch(authState.actions.setNick(user.displayName!));
       dispatch(authState.actions.setEmail(user.email!));
-      user.photoURL && dispatch(authState.actions.setPhoto(user.photoURL!));
+      if (user.photoURL) dispatch(authState.actions.setPhoto(user.photoURL!));
     } else setIsAuth(false);
   });
+  function setOnline(nick: string) {
+    database()
+      .ref("nicknames/" + nick)
+      .update({ online: true })
+      .catch((error) => console.error(error));
+  }
 
   return (
     <>

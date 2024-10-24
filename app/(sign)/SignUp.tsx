@@ -44,16 +44,18 @@ export default function SignUp() {
   async function onSubmit(data: SignUpData) {
     const equalPass = data.confirm_password === data.password;
     const isAccessNick = await includesNick(data.nickname);
+
     if (equalPass && !isAccessNick) {
       auth()
         .createUserWithEmailAndPassword(data.email, data.password)
         .then((result) => {
           dispatch(authState.actions.setNick(data.nickname));
           router.replace("/");
-          const stringRef = getStringRef(data.email);
+
           database()
             .ref("nicknames/" + data.nickname)
-            .set({ email: stringRef, nickname: data.nickname });
+            .set({ email: getStringRef(data.email), nickname: data.nickname });
+            
           return result.user.updateProfile({
             displayName: data.nickname,
           });
