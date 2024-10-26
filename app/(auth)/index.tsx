@@ -10,7 +10,7 @@ import {
   AppState,
   RefreshControl,
 } from "react-native";
-import database, { update } from "@react-native-firebase/database";
+import database from "@react-native-firebase/database";
 import { useDispatch, useSelector } from "react-redux";
 import { Store } from "@/redux/Store";
 import useLanguage from "@/hooks/useLanguage";
@@ -90,7 +90,7 @@ export default function InitialAuth() {
     return () => {
       subscription.remove();
     };
-  }, [loadNicksAndMessages, updateOnlineStatus]);
+  }, []);
 
   function createArrayInfo() {
     if (nicks.length) {
@@ -109,7 +109,7 @@ export default function InitialAuth() {
 
   useEffect(() => {
     createArrayInfo();
-  }, [nicks, createArrayInfo]);
+  }, [nicks]);
 
   const lang = useLanguage();
 
@@ -168,7 +168,7 @@ export default function InitialAuth() {
           </View>
         )
       )}
-      <ConfirmModule emailProp={emailRef.current} />
+      <ConfirmModule />
       {isOpenConfirmModule && (
         <Overlay
           close={() => dispatch(chatMenuState.actions.closeConfirmModule())}

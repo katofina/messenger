@@ -47,6 +47,7 @@ const getStyles = (colors: ObjectColor) =>
       width: 200,
       justifyContent: 'center',
       alignItems: 'center',
+      zIndex: 10
     },
     button: {
       height: 30,

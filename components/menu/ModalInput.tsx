@@ -63,7 +63,7 @@ export const ModalInput = ({ isOpen, close }: Props) => {
       .once("value")
       .then((snapshot) => {
         const data = snapshot.val();
-        data && (nicknames = Object.values(data));
+        data && (nicknames = Object.keys(data));
       });
     const isAccessNick = nicknames.includes(data.nickname);
     if (!isAccessNick) {

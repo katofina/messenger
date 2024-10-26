@@ -1,13 +1,15 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export interface ChatMenuState {
   isOpenChatMenu: boolean;
   isOpenConfirmModule: boolean;
+  email: null | string;
 }
 
 const initialState: ChatMenuState = {
   isOpenChatMenu: false,
   isOpenConfirmModule: false,
+  email: null,
 };
 
 export const chatMenuState = createSlice({
@@ -25,6 +27,9 @@ export const chatMenuState = createSlice({
     },
     closeConfirmModule: (state) => {
       state.isOpenConfirmModule = false;
+    },
+    setEmail: (state, action: PayloadAction<string>) => {
+      state.email = action.payload;
     },
   },
 });

@@ -46,21 +46,16 @@ export default function SignUp() {
     const isAccessNick = await includesNick(data.nickname);
 
     if (equalPass && !isAccessNick) {
-      auth()
-        .createUserWithEmailAndPassword(data.email, data.password)
-        .then((result) => {
-          dispatch(authState.actions.setNick(data.nickname));
-          router.replace("/");
+      const result = await auth().createUserWithEmailAndPassword(data.email, data.password);
+      await result.user.updateProfile({ displayName: data.nickname });
 
-          database()
-            .ref("nicknames/" + data.nickname)
-            .set({ email: getStringRef(data.email), nickname: data.nickname });
-            
-          return result.user.updateProfile({
-            displayName: data.nickname,
-          });
-        })
-        .catch((error) => setError(String(error)));
+      dispatch(authState.actions.setNick(data.nickname));
+      router.replace("/");
+
+      database()
+        .ref("nicknames/" + data.nickname)
+        .set({ email: getStringRef(data.email), nickname: data.nickname });
+        
     } else if (!equalPass) setIsConfirPass(false);
     else setIsExistNick(true);
   }

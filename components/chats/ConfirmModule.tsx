@@ -21,22 +21,24 @@ import { useDispatch, useSelector } from "react-redux";
 import database from "@react-native-firebase/database";
 import { useLocalSearchParams } from "expo-router";
 
-interface Prop {
-  emailProp?: string;
-}
-
-export const ConfirmModule = ({ emailProp }: Prop) => {
-  const [isDeleteAll, setIsDeleteAll] = useState(false);
+export const ConfirmModule = () => {
+  const [isDeleteBoth, setIsDeleteBoth] = useState(false);
   function checkDeleteForBoth() {
-    setIsDeleteAll((prev) => !prev);
-  }
+    setIsDeleteBoth((prev) => !prev);
+  };
+
+
   const { email } = useLocalSearchParams();
   const user = useSelector((store: Store) => store.authState);
+  const deletedEmail = useSelector((store: Store) => store.chatMenuState.email);
+
+
   function deleteAllMessages() {
-    const neededEmail = email || emailProp;
+    const neededEmail = email || deletedEmail;
     const userRef = user.stringRef + "/chats/" + neededEmail;
     const contactRef = neededEmail + "/chats/" + user.stringRef;
-    if (isDeleteAll) {
+    
+    if (isDeleteBoth) {
       if (email) {
         database()
           .ref(userRef + "/messages")
@@ -45,16 +47,13 @@ export const ConfirmModule = ({ emailProp }: Prop) => {
           .ref(contactRef + "/messages")
           .remove();
       }
-      if (emailProp) {
+      if (deletedEmail) {
         database().ref(userRef).remove();
         database().ref(contactRef).remove();
       }
     } else {
-      email &&
-        database()
-          .ref(userRef + "/messages")
-          .remove();
-      emailProp && database().ref(userRef).remove();
+      email && database().ref(userRef + "/messages").remove();
+      deletedEmail && database().ref(userRef).remove();
     }
     closeModule();
   }
@@ -83,7 +82,7 @@ export const ConfirmModule = ({ emailProp }: Prop) => {
     <Animated.View style={[styles.container, { transform: [{ translateY }] }]}>
       <Text style={styles.mainText}>{lang.confirmOfDeleteAll}</Text>
       <Pressable style={styles.confirmView} onPress={checkDeleteForBoth}>
-        {isDeleteAll ? (
+        {isDeleteBoth ? (
           <Feather name="check-square" size={24} color={colors.icon} />
         ) : (
           <Feather name="square" size={24} color={colors.icon} />

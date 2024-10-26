@@ -8,6 +8,7 @@ import { ObjectColor } from "@/constants/theme/types";
 import { useDispatch } from "react-redux";
 import { chatMenuState } from "@/redux/ChatMenuSlice";
 import { AntDesign } from "@expo/vector-icons";
+import { useRef } from "react";
 
 interface Props {
   nick: string;
@@ -39,11 +40,18 @@ export const EveryDialog = ({
 
   const dispatch = useDispatch();
 
+  const swipeableRef = useRef<null | Swipeable>(null);
+
   return (
     <Swipeable
+      ref={swipeableRef}
       onSwipeableOpen={(direction) => {
         if (direction === "right") {
           dispatch(chatMenuState.actions.openConfirmModule());
+          dispatch(chatMenuState.actions.setEmail(email));
+          if (swipeableRef.current) {
+            swipeableRef.current.close();
+          }
         }
       }}
       renderRightActions={() => (
