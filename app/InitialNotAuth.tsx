@@ -63,6 +63,7 @@ const getStyles = (colors: ObjectColor) =>
       flexDirection: "row",
       backgroundColor: colors.button,
       shadowColor: "grey",
+      shadowOpacity: 0.5,
       elevation: 10,
     },
     text: {

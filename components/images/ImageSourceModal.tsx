@@ -126,6 +126,7 @@ const getStyles = (colors: ObjectColor, leftGap: number) =>
       width: WIDTH_MODAL,
       backgroundColor: colors.background,
       shadowColor: colors.shadowColor,
+      shadowOpacity: 0.5,
       elevation: 10,
       top: 0,
       left: leftGap,

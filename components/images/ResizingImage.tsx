@@ -34,15 +34,17 @@ export const ResizingImage = ({ url, sizeImg, sizeView }: Prop) => {
 
   return (
     <>
-      <Modal visible={isOpenModal} transparent={true} animationType="slide">
-        <Overlay close={closeModule} />
-        <View style={styles.container}>
-          <TouchableOpacity style={styles.close} onPress={closeModule}>
-            <AntDesign name="close" size={40} color={colors.icon} />
-          </TouchableOpacity>
-          <Image source={{ uri: url }} style={styles.image} />
-        </View>
-      </Modal>
+      {url && (
+        <Modal visible={isOpenModal} transparent={true} animationType="slide">
+          <Overlay close={closeModule} />
+          <View style={styles.container}>
+            <TouchableOpacity style={styles.close} onPress={closeModule}>
+              <AntDesign name="close" size={40} color={colors.icon} />
+            </TouchableOpacity>
+            <Image source={{ uri: url }} style={styles.image} />
+          </View>
+        </Modal>
+      )}
       <Pressable onPress={() => setIsOpenModule(true)}>
         <Avatar photo={url} sizeImg={sizeImg} sizeView={sizeView} />
       </Pressable>

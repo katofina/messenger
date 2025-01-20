@@ -1,8 +1,7 @@
-import { Avatar } from "@/components/menu/Avatar";
 import { ObjectColor } from "@/constants/theme/types";
 import useThemeColor from "@/hooks/useThemeColor";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { View, StyleSheet, Text, Pressable } from "react-native";
+import { View, StyleSheet, Text, Pressable, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Entypo } from "@expo/vector-icons";
 import { chatMenuState } from "@/redux/ChatMenuSlice";
@@ -11,6 +10,7 @@ import useLanguage from "@/hooks/useLanguage";
 import { Store } from "@/redux/Store";
 import { Overlay } from "@/components/overlay/Overlay";
 import { ResizingImage } from "@/components/images/ResizingImage";
+import { BackButton } from "@/components/headerButtons/BackButton";
 
 export default function ChatLayout() {
   const { colors } = useThemeColor();
@@ -40,8 +40,8 @@ export default function ChatLayout() {
           headerTintColor: colors.text,
           headerRight: () => (
             <>
-              <View style={styles.container}>
-                <ResizingImage url={photo} sizeImg={45} sizeView={45}/>
+              <TouchableOpacity style={styles.container}>
+                <ResizingImage url={photo} sizeImg={40} sizeView={40} />
                 <View style={styles.textView}>
                   <Text style={styles.nick}>{nick}</Text>
                   {online === "true" ? (
@@ -50,14 +50,15 @@ export default function ChatLayout() {
                     <Text style={styles.offline}>{lang.offline}</Text>
                   )}
                 </View>
-              </View>
-              <Pressable style={styles.buttonMenu} onPress={openMenu}>
-                <Entypo name="menu" size={24} color={colors.icon} />
-              </Pressable>
+                <TouchableOpacity style={styles.buttonMenu} onPress={openMenu}>
+                  <Entypo name="menu" size={24} color={colors.icon} />
+                </TouchableOpacity>
+              </TouchableOpacity>
               <ChatMenu />
-              {isOpenMenu && <Overlay close={() => dispatch(chatMenuState.actions.closeChatMenu())}/>}
+              {isOpenMenu && <Overlay close={() => dispatch(chatMenuState.actions.closeChatMenu())} />}
             </>
           ),
+          headerLeft: () => <BackButton />
         }}
       />
     </Stack>
@@ -68,9 +69,9 @@ const getStyles = (colors: ObjectColor) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
-      width: "85%",
-      zIndex: 0,
+      width: 300,
       justifyContent: "flex-start",
+      zIndex: 1
     },
     textView: {
       paddingLeft: 15,
@@ -90,5 +91,6 @@ const getStyles = (colors: ObjectColor) =>
       justifyContent: "center",
       position: "absolute",
       right: 0,
+      padding: 10,
     },
   });

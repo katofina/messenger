@@ -183,6 +183,7 @@ const getStyles = (colors: ObjectColor) =>
     },
     form: {
       shadowColor: colors.shadowColor,
+      shadowOpacity: 0.5,
       elevation: 10,
       backgroundColor: colors.background,
       width: "80%",
@@ -192,6 +193,7 @@ const getStyles = (colors: ObjectColor) =>
     },
     button: {
       shadowColor: colors.shadowColor,
+      shadowOpacity: 0.5,
       elevation: 5,
       backgroundColor: colors.button,
       width: 150,

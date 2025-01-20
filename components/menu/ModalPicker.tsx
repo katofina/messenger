@@ -99,6 +99,7 @@ const getStyles = (colors: ObjectColor) =>
       width: "70%",
       backgroundColor: colors.background,
       shadowColor: colors.shadowColor,
+      shadowOpacity: 0.5,
       elevation: 10,
       justifyContent: "center",
       alignItems: "center",

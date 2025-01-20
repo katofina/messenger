@@ -15,6 +15,7 @@ package-lock.json
 .DS_Store
 
 android/
+ios/
 
 .vscode/
 

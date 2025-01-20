@@ -131,7 +131,7 @@ export default function Chat() {
           cursorColor={colors.cursor}
           style={styles.input}
           value={text}
-          multiline={true}
+          multiline={false}
           numberOfLines={1}
         />
         <TouchableOpacity onPress={() => sendMessage(text)}>

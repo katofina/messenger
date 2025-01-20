@@ -48,6 +48,8 @@ export const translation = {
     uploadProfilePhoto: "Upload Profile Photo",
     absenceDialogs: "You don't have any dialog yet.",
     share: "Share",
+    successUpload: "Photo is successfully uploaded.",
+    failUpload: "Something went wrong!"
   },
   ru: {
     welcome: "Добро пожаловать в Messenger",
@@ -98,5 +100,7 @@ export const translation = {
     uploadProfilePhoto: "Загрузить фото профиля",
     absenceDialogs: "У вас ещё нет ни одного диалога.",
     share: "Поделиться",
+    successUpload: "Фото успешно загружено.",
+    failUpload: "Что-то пошло не так!"
   },
 };

@@ -153,6 +153,7 @@ const getStyles = (colors: ObjectColor) =>
       height: "100%",
       backgroundColor: colors.background,
       shadowColor: colors.shadowColor,
+      shadowOpacity: 0.5,
       elevation: 10,
       justifyContent: "flex-start",
       alignItems: "center",
@@ -178,6 +179,7 @@ const getStyles = (colors: ObjectColor) =>
     button: {
       backgroundColor: colors.button,
       shadowColor: colors.shadowColor,
+      shadowOpacity: 0.5,
       elevation: 10,
       width: 100,
       alignItems: "center",

@@ -4,6 +4,7 @@ import { Stack } from "expo-router";
 import { TextInput, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import useLanguage from "@/hooks/useLanguage";
+import { BackButton } from "@/components/headerButtons/BackButton";
 
 export default function SearchLayout() {
   const { colors } = useThemeColor();
@@ -21,6 +22,8 @@ export default function SearchLayout() {
         name="index"
         options={{
           headerTitle: "",
+          headerBackTitle: "",
+          headerBackTitleVisible: true,
           headerStyle: { backgroundColor: colors.headerBc },
           headerTintColor: colors.text,
           headerRight: () => (
@@ -33,6 +36,9 @@ export default function SearchLayout() {
               autoFocus={true}
             />
           ),
+          headerLeft: () => (
+            <BackButton/>
+          )
         }}
       />
     </Stack>

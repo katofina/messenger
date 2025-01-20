@@ -100,7 +100,7 @@ export default function Settings() {
     if (loadObject.isSuccess) {
       setHint({
         color: colors.success,
-        text: "Photo is successfully uploaded.",
+        text: lang.successUpload,
         isOpen: true,
       });
       dispatch(authState.actions.setPhoto(loadObject.url!));
@@ -110,7 +110,7 @@ export default function Settings() {
     } else {
       setHint({
         color: colors.error,
-        text: loadObject.error!,
+        text: lang.failUpload,
         isOpen: true,
       });
     }

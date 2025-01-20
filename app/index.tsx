@@ -9,6 +9,7 @@ import { ThemeString } from "@/constants/theme/types";
 import { langState } from "@/redux/LanguageSlice";
 import { LanguageString } from "@/constants/language/types";
 import database from "@react-native-firebase/database";
+import React from "react";
 
 export default function Index() {
   const [isAuth, setIsAuth] = useState<boolean>(false);
